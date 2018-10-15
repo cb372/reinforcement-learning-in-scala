@@ -7,11 +7,19 @@ object PoleBalancingProblem {
 
   // TODO BigDecimal?
   case class PoleCartState(
-                            cartPosition: Double,   // metres from start position
-                            cartVelocity: Double,   // m/s
-                            poleAngle: Double,      // degrees from vertical
-                            poleAngleChange: Double // degrees/second
-                          )
+                            cartPosition: Double, // metres from start position (-ve is left, +ve is right)
+                            cartVelocity: Double, // m/s
+                            poleAngle: Double,    // radians, angle from vertical
+                            poleVelocity: Double  // radians/second, angular velocity
+                          ) {
+    override def toString: String =
+      s"""Pole-cart:
+         |x  = $cartPosition
+         |x' = $cartVelocity
+         |θ  = ${toDegrees(poleAngle)}
+         |θ' = ${toDegrees(poleVelocity)}
+       """.stripMargin
+  }
 
   sealed trait PushCart
   object PushCart {
@@ -61,7 +69,7 @@ object PoleBalancingProblem {
       val x_t = currentState.cartPosition
       val `x'_t` = currentState.cartVelocity
       val θ_t = currentState.poleAngle
-      val `θ'_t` = currentState.poleAngleChange
+      val `θ'_t` = currentState.poleVelocity
 
       val h = 0.02 // seconds, time step
 
@@ -83,7 +91,7 @@ object PoleBalancingProblem {
         cartPosition = `x_t+1`,
         cartVelocity = `x'_t+1`,
         poleAngle = `θ_t+1`,
-        poleAngleChange = `θ'_t+1`
+        poleVelocity = `θ'_t+1`
       )
       val reward = if (isTerminal(nextState)) -1.0 else 0.0
 
@@ -91,9 +99,9 @@ object PoleBalancingProblem {
     }
 
     override def isTerminal(state: PoleCartState): Boolean = {
-      val absAngle = Math.abs(state.poleAngle)
       val absPosition = Math.abs(state.cartPosition)
-      absPosition > 2.4 || absAngle > 12
+      val absAngleDegrees = toDegrees(Math.abs(state.poleAngle))
+      absPosition > 2.4 || absAngleDegrees > 12
     }
 
   }
