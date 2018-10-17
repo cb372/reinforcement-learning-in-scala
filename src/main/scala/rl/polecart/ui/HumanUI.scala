@@ -23,23 +23,74 @@ object HumanUI {
       .asInstanceOf[dom.CanvasRenderingContext2D]
 
     def clear() = {
+      // clear the canvas
       ctx.fillStyle = "white"
-      ctx.fillRect(0, 0, 600, 300)
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
 
+      // border
+      ctx.lineWidth = 3
+      ctx.strokeStyle = "black"
       ctx.fillStyle = "black"
-      ctx.strokeRect(0, 0, 600, 300)
-      ctx.fillRect(0, 250, 50, 50)
-      ctx.fillRect(550, 250, 50, 50)
+      ctx.strokeRect(0, 0, canvas.width, canvas.height)
+
+      // walls
+      val wallWidth = 50
+      val wallHeight = 50
+      val wallTop = canvas.height - wallHeight
+      ctx.fillRect(0, wallTop, wallWidth, wallHeight)
+      ctx.fillRect(canvas.width - wallWidth, wallTop, wallWidth, wallHeight)
     }
 
     def drawCart(state: PoleBalancingProblem.PoleCartState) = {
-      val middleX = 300 + (state.cartPosition * 100)
-      val leftX = middleX - 10
-      val topY = 250
+      val cartTopY = canvas.height - 50
+      val cartWidth = 70
+      val cartHeight = 30
+      val cartMiddleX = 325 + (state.cartPosition * 100)
+      val cartLeftX = cartMiddleX - cartWidth / 2
+
+      val wheelY = canvas.height - 10
+      val leftWheelX = cartMiddleX - 20
+      val rightWheelX = cartMiddleX + 20
+
+      // cart
       ctx.fillStyle = "blue"
-      ctx.fillRect(leftX, topY, 20, 40)
-      // TODO wheels
-      // TODO pole
+      ctx.fillRect(cartLeftX, cartTopY, cartWidth, cartHeight)
+
+      // left wheel
+      ctx.beginPath()
+      ctx.fillStyle = "blue"
+      ctx.arc(leftWheelX, wheelY, 10.0, 0.0, 2 * Math.PI)
+      ctx.fill()
+      ctx.closePath()
+
+      // right wheel
+      ctx.beginPath()
+      ctx.fillStyle = "blue"
+      ctx.arc(rightWheelX, wheelY, 10.0, 0.0, 2 * Math.PI)
+      ctx.fill()
+      ctx.closePath()
+
+      // pole
+      val poleX = cartMiddleX
+      val poleBottomY = cartTopY - 5
+      val poleTopY = poleBottomY - 50
+
+      ctx.beginPath()
+
+      ctx.translate(poleX, poleBottomY)
+      ctx.rotate(state.poleAngle)
+      ctx.translate(-poleX, -poleBottomY)
+
+      ctx.strokeStyle = "green"
+      ctx.moveTo(poleX, poleBottomY)
+      ctx.lineTo(poleX, poleTopY)
+      ctx.lineWidth = 6
+      ctx.stroke()
+
+      ctx.closePath()
+
+      // reset transform
+      ctx.setTransform(1,0,0,1,0,0)
     }
 
     var uiState: UIState = Idle

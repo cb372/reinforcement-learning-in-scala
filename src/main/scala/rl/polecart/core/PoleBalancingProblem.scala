@@ -7,7 +7,7 @@ object PoleBalancingProblem {
 
   // TODO BigDecimal?
   case class PoleCartState(
-                            cartPosition: Double, // metres from start position (-ve is left, +ve is right)
+                            cartPosition: Double, // metres from start position (middle of cart, -ve is left, +ve is right)
                             cartVelocity: Double, // m/s
                             poleAngle: Double,    // radians, angle from vertical
                             poleVelocity: Double  // radians/second, angular velocity
