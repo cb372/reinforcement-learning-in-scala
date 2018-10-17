@@ -29,8 +29,6 @@ object PoleBalancingProblem {
 
   implicit val environment: Environment[PoleCartState, PushCart] = new Environment[PoleCartState, PushCart] {
 
-    override def validActions(currentState: PoleCartState): Set[PushCart] = Set(PushCart.Left, PushCart.Right)
-
     override def step(currentState: PoleCartState, actionTaken: PushCart): (PoleCartState, Reward) = {
       /*
       First we use non-linear differential equations to calculate the double derivatives

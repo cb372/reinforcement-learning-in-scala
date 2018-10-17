@@ -1,8 +1,8 @@
 package rl.polecart.ui
 
 import org.scalajs.dom
+import org.scalajs.dom.Window
 
-import scala.util.Random
 import org.scalajs.dom.html.Canvas
 import rl.polecart.core.PoleBalancingProblem
 
@@ -18,11 +18,11 @@ object HumanUI {
   private val initialPoleCartState = PoleBalancingProblem.PoleCartState(0.0, 0.0, 0.0, 0.0)
 
   @JSExport
-  def main(canvas: Canvas, infoLabel: dom.Element, timeLabel: dom.Element, statusLabel: dom.Element): Unit = {
+  def main(window: Window, canvas: Canvas, infoLabel: dom.Element, timeLabel: dom.Element, statusLabel: dom.Element): Unit = {
     val ctx = canvas.getContext("2d")
       .asInstanceOf[dom.CanvasRenderingContext2D]
 
-    def clear() = {
+    def clear(): Unit = {
       // clear the canvas
       ctx.fillStyle = "white"
       ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -41,7 +41,7 @@ object HumanUI {
       ctx.fillRect(canvas.width - wallWidth, wallTop, wallWidth, wallHeight)
     }
 
-    def drawCart(state: PoleBalancingProblem.PoleCartState) = {
+    def drawCart(state: PoleBalancingProblem.PoleCartState): Unit = {
       val cartTopY = canvas.height - 50
       val cartWidth = 70
       val cartHeight = 30
@@ -95,36 +95,56 @@ object HumanUI {
 
     var uiState: UIState = Idle
 
-    var poleCartState = initialPoleCartState
-    var currentAction = PoleBalancingProblem.PushCart.Left
+    var poleCartState: PoleBalancingProblem.PoleCartState = initialPoleCartState
+    var currentAction: PoleBalancingProblem.PushCart = PoleBalancingProblem.PushCart.Left
+    var timeElapsed = 0.0
+    var maxTimeElapsed = 0.0
 
-    def tick = {
+    def tick(): Unit = {
       clear()
 
       uiState match {
         case Idle =>
-          infoLabel.textContent = "Press ← or → to start"
           drawCart(poleCartState)
         case Running =>
-          // TODO keyboard events
+          timeElapsed += 0.02
+          poleCartState = PoleBalancingProblem.environment.step(poleCartState, currentAction)._1
           drawCart(poleCartState)
+          if (PoleBalancingProblem.environment.isTerminal(poleCartState)) {
+            failed()
+          }
       }
-//      for (i <- 0 until 10){
-//        if (count % 3000 == 0) clear()
-//        count += 1
-//        p = (p + corners(Random.nextInt(3))) / 2
-//
-//        val height = 512.0 / (255 + p.y)
-//        val r = (p.x * height).toInt
-//        val g = ((255-p.x) * height).toInt
-//        val b = p.y
-//        ctx.fillStyle = s"rgb($g, $r, $b)"
-//
-//        ctx.fillRect(p.x, p.y, 1, 1)
-//      }
     }
 
-    dom.window.setInterval(() => tick, 20)
+    def running(): Unit = {
+      infoLabel.textContent = ""
+      poleCartState = initialPoleCartState
+      uiState = Running
+    }
+
+    def failed(): Unit = {
+      maxTimeElapsed = maxTimeElapsed max timeElapsed
+      infoLabel.textContent = f"FAILED! You lasted $timeElapsed%.2f seconds. Your record is $maxTimeElapsed%.2f seconds. Press ← or → to try again"
+      timeElapsed = 0.0
+      uiState = Idle
+    }
+
+    window.onkeydown = { event =>
+      event.key match {
+        case "ArrowLeft" =>
+          currentAction = PoleBalancingProblem.PushCart.Left
+          running()
+        case "ArrowRight" =>
+          currentAction = PoleBalancingProblem.PushCart.Right
+          running()
+        case other =>
+          // ignore
+      }
+    }
+
+    infoLabel.textContent = "Press ← or → to start"
+
+    dom.window.setInterval(() => tick(), 20)
   }
 
 }
