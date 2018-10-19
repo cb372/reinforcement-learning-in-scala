@@ -1,8 +1,6 @@
 package rl.polecart.ui
 
 import org.scalajs.dom
-import org.scalajs.dom.Window
-
 import org.scalajs.dom.html.Canvas
 import rl.polecart.core.PoleBalancingProblem
 
@@ -18,81 +16,7 @@ object HumanUI {
   private val initialPoleCartState = PoleBalancingProblem.PoleCartState(0.0, 0.0, 0.0, 0.0)
 
   @JSExport
-  def main(window: Window, canvas: Canvas, infoLabel: dom.Element, timeLabel: dom.Element, statusLabel: dom.Element): Unit = {
-    val ctx = canvas.getContext("2d")
-      .asInstanceOf[dom.CanvasRenderingContext2D]
-
-    def clear(): Unit = {
-      // clear the canvas
-      ctx.fillStyle = "white"
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-      // border
-      ctx.lineWidth = 3
-      ctx.strokeStyle = "black"
-      ctx.fillStyle = "black"
-      ctx.strokeRect(0, 0, canvas.width, canvas.height)
-
-      // walls
-      val wallWidth = 50
-      val wallHeight = 50
-      val wallTop = canvas.height - wallHeight
-      ctx.fillRect(0, wallTop, wallWidth, wallHeight)
-      ctx.fillRect(canvas.width - wallWidth, wallTop, wallWidth, wallHeight)
-    }
-
-    def drawCart(state: PoleBalancingProblem.PoleCartState): Unit = {
-      val cartTopY = canvas.height - 50
-      val cartWidth = 70
-      val cartHeight = 30
-      val cartMiddleX = 325 + (state.cartPosition * 100)
-      val cartLeftX = cartMiddleX - cartWidth / 2
-
-      val wheelY = canvas.height - 10
-      val leftWheelX = cartMiddleX - 20
-      val rightWheelX = cartMiddleX + 20
-
-      // cart
-      ctx.fillStyle = "blue"
-      ctx.fillRect(cartLeftX, cartTopY, cartWidth, cartHeight)
-
-      // left wheel
-      ctx.beginPath()
-      ctx.fillStyle = "blue"
-      ctx.arc(leftWheelX, wheelY, 10.0, 0.0, 2 * Math.PI)
-      ctx.fill()
-      ctx.closePath()
-
-      // right wheel
-      ctx.beginPath()
-      ctx.fillStyle = "blue"
-      ctx.arc(rightWheelX, wheelY, 10.0, 0.0, 2 * Math.PI)
-      ctx.fill()
-      ctx.closePath()
-
-      // pole
-      val poleX = cartMiddleX
-      val poleBottomY = cartTopY - 5
-      val poleTopY = poleBottomY - 50
-
-      ctx.beginPath()
-
-      ctx.translate(poleX, poleBottomY)
-      ctx.rotate(state.poleAngle)
-      ctx.translate(-poleX, -poleBottomY)
-
-      ctx.strokeStyle = "green"
-      ctx.moveTo(poleX, poleBottomY)
-      ctx.lineTo(poleX, poleTopY)
-      ctx.lineWidth = 6
-      ctx.stroke()
-
-      ctx.closePath()
-
-      // reset transform
-      ctx.setTransform(1,0,0,1,0,0)
-    }
-
+  def main(window: dom.Window, canvas: Canvas, infoLabel: dom.Element): Unit = {
     var uiState: UIState = Idle
 
     var poleCartState: PoleBalancingProblem.PoleCartState = initialPoleCartState
@@ -101,15 +25,15 @@ object HumanUI {
     var maxTimeElapsed = 0.0
 
     def tick(): Unit = {
-      clear()
+      clear(canvas)
 
       uiState match {
         case Idle =>
-          drawCart(poleCartState)
+          drawCart(canvas, poleCartState, timeElapsed)
         case Running =>
           timeElapsed += 0.02
           poleCartState = PoleBalancingProblem.environment.step(poleCartState, currentAction)._1
-          drawCart(poleCartState)
+          drawCart(canvas, poleCartState, timeElapsed)
           if (PoleBalancingProblem.environment.isTerminal(poleCartState)) {
             failed()
           }
@@ -146,5 +70,88 @@ object HumanUI {
 
     dom.window.setInterval(() => tick(), 20)
   }
+
+  private def clear(canvas: Canvas): Unit = {
+    val ctx = canvas.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]
+
+    // clear the canvas
+    ctx.fillStyle = "white"
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+    // border
+    ctx.lineWidth = 3
+    ctx.strokeStyle = "black"
+    ctx.fillStyle = "black"
+    ctx.strokeRect(0, 0, canvas.width, canvas.height)
+
+    // walls
+    val wallWidth = 50
+    val wallHeight = 50
+    val wallTop = canvas.height - wallHeight
+    ctx.fillRect(0, wallTop, wallWidth, wallHeight)
+    ctx.fillRect(canvas.width - wallWidth, wallTop, wallWidth, wallHeight)
+  }
+
+  private def drawCart(canvas: Canvas, state: PoleBalancingProblem.PoleCartState, timeElapsed: Double): Unit = {
+    val ctx = canvas.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]
+
+    val cartTopY = canvas.height - 50
+    val cartWidth = 70
+    val cartHeight = 30
+    val cartMiddleX = 325 + (state.cartPosition * 100)
+    val cartLeftX = cartMiddleX - cartWidth / 2
+
+    val wheelY = canvas.height - 10
+    val leftWheelX = cartMiddleX - 20
+    val rightWheelX = cartMiddleX + 20
+
+    // cart
+    ctx.fillStyle = "blue"
+    ctx.fillRect(cartLeftX, cartTopY, cartWidth, cartHeight)
+
+    // left wheel
+    ctx.beginPath()
+    ctx.fillStyle = "blue"
+    ctx.arc(leftWheelX, wheelY, 10.0, 0.0, 2 * Math.PI)
+    ctx.fill()
+    ctx.closePath()
+
+    // right wheel
+    ctx.beginPath()
+    ctx.fillStyle = "blue"
+    ctx.arc(rightWheelX, wheelY, 10.0, 0.0, 2 * Math.PI)
+    ctx.fill()
+    ctx.closePath()
+
+    // pole
+    val poleX = cartMiddleX
+    val poleBottomY = cartTopY - 5
+    val poleTopY = poleBottomY - 50
+
+    ctx.beginPath()
+
+    ctx.translate(poleX, poleBottomY)
+    ctx.rotate(state.poleAngle)
+    ctx.translate(-poleX, -poleBottomY)
+
+    ctx.strokeStyle = "green"
+    ctx.moveTo(poleX, poleBottomY)
+    ctx.lineTo(poleX, poleTopY)
+    ctx.lineWidth = 6
+    ctx.stroke()
+
+    ctx.closePath()
+
+    // reset transform
+    ctx.setTransform(1,0,0,1,0,0)
+
+    ctx.beginPath()
+    ctx.strokeStyle = "black"
+    ctx.lineWidth = 1
+    ctx.strokeText(f"t = $timeElapsed%.2f", 10, 20)
+    ctx.closePath()
+  }
+
+
 
 }
