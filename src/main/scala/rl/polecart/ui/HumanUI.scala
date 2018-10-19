@@ -10,18 +10,20 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 object HumanUI {
 
   sealed trait UIState
-  case object Idle extends UIState
+  case object Idle    extends UIState
   case object Running extends UIState
 
-  private val initialPoleCartState = PoleBalancingProblem.PoleCartState(0.0, 0.0, 0.0, 0.0)
+  private val initialPoleCartState =
+    PoleBalancingProblem.PoleCartState(0.0, 0.0, 0.0, 0.0)
 
   @JSExport
   def main(window: dom.Window, canvas: Canvas, infoLabel: dom.Element): Unit = {
     var uiState: UIState = Idle
 
     var poleCartState: PoleBalancingProblem.PoleCartState = initialPoleCartState
-    var currentAction: PoleBalancingProblem.PushCart = PoleBalancingProblem.PushCart.Left
-    var timeElapsed = 0.0
+    var currentAction: PoleBalancingProblem.PushCart =
+      PoleBalancingProblem.PushCart.Left
+    var timeElapsed    = 0.0
     var maxTimeElapsed = 0.0
 
     def tick(): Unit = {
@@ -32,7 +34,9 @@ object HumanUI {
           drawCart(canvas, poleCartState, timeElapsed)
         case Running =>
           timeElapsed += 0.02
-          poleCartState = PoleBalancingProblem.environment.step(poleCartState, currentAction)._1
+          poleCartState = PoleBalancingProblem.environment
+            .step(poleCartState, currentAction)
+            ._1
           drawCart(canvas, poleCartState, timeElapsed)
           if (PoleBalancingProblem.environment.isTerminal(poleCartState)) {
             failed()
@@ -48,7 +52,8 @@ object HumanUI {
 
     def failed(): Unit = {
       maxTimeElapsed = maxTimeElapsed max timeElapsed
-      infoLabel.textContent = f"FAILED! You lasted $timeElapsed%.2f seconds. Your record is $maxTimeElapsed%.2f seconds. Press ← or → to try again"
+      infoLabel.textContent =
+        f"FAILED! You lasted $timeElapsed%.2f seconds. Your record is $maxTimeElapsed%.2f seconds. Press ← or → to try again"
       timeElapsed = 0.0
       uiState = Idle
     }
@@ -62,7 +67,7 @@ object HumanUI {
           currentAction = PoleBalancingProblem.PushCart.Right
           running()
         case other =>
-          // ignore
+        // ignore
       }
     }
 
@@ -85,24 +90,26 @@ object HumanUI {
     ctx.strokeRect(0, 0, canvas.width, canvas.height)
 
     // walls
-    val wallWidth = 50
+    val wallWidth  = 50
     val wallHeight = 50
-    val wallTop = canvas.height - wallHeight
+    val wallTop    = canvas.height - wallHeight
     ctx.fillRect(0, wallTop, wallWidth, wallHeight)
     ctx.fillRect(canvas.width - wallWidth, wallTop, wallWidth, wallHeight)
   }
 
-  private def drawCart(canvas: Canvas, state: PoleBalancingProblem.PoleCartState, timeElapsed: Double): Unit = {
+  private def drawCart(canvas: Canvas,
+                       state: PoleBalancingProblem.PoleCartState,
+                       timeElapsed: Double): Unit = {
     val ctx = canvas.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]
 
-    val cartTopY = canvas.height - 50
-    val cartWidth = 70
-    val cartHeight = 30
+    val cartTopY    = canvas.height - 50
+    val cartWidth   = 70
+    val cartHeight  = 30
     val cartMiddleX = 325 + (state.cartPosition * 100)
-    val cartLeftX = cartMiddleX - cartWidth / 2
+    val cartLeftX   = cartMiddleX - cartWidth / 2
 
-    val wheelY = canvas.height - 10
-    val leftWheelX = cartMiddleX - 20
+    val wheelY      = canvas.height - 10
+    val leftWheelX  = cartMiddleX - 20
     val rightWheelX = cartMiddleX + 20
 
     // cart
@@ -124,9 +131,9 @@ object HumanUI {
     ctx.closePath()
 
     // pole
-    val poleX = cartMiddleX
+    val poleX       = cartMiddleX
     val poleBottomY = cartTopY - 5
-    val poleTopY = poleBottomY - 50
+    val poleTopY    = poleBottomY - 50
 
     ctx.beginPath()
 
@@ -143,7 +150,7 @@ object HumanUI {
     ctx.closePath()
 
     // reset transform
-    ctx.setTransform(1,0,0,1,0,0)
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
 
     ctx.beginPath()
     ctx.strokeStyle = "black"
@@ -151,7 +158,5 @@ object HumanUI {
     ctx.strokeText(f"t = $timeElapsed%.2f", 10, 20)
     ctx.closePath()
   }
-
-
 
 }
