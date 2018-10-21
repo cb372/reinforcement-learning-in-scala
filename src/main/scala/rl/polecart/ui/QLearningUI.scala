@@ -17,10 +17,9 @@ object QLearningUI {
   case object RunningEpisode extends UIState
   case object RunningForever extends UIState
 
-  private val initialPoleCartState =
+  private val initialPoleCartState: PoleCartState =
     PoleBalancingProblem.PoleCartState(0.0, 0.0, 0.0, 0.0)
 
-  // TODO discounted or not?
   private val initialAgent: QLearning[RoughPoleCartState, PushCart] =
     QLearning(α = 0.1, γ = 1.0, ε = 0.1, Q = Map.empty)
 

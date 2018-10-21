@@ -3,16 +3,40 @@
 <head>
     <title>Gridworld</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 5px;
+            text-align: left;
+        }
+        div {
+            padding: 10px;
+        }
+    </style>
 </head>
 <body style="margin: 0px">
 
 <div>
-    <canvas style="display: block" id="canvas" width="255" height="255"/>
+    <canvas style="display: block" id="canvas" width="400" height="400"/>
+</div>
+
+<div>
+    <button id="step">Step</button>
+    <button id="run">Run</button>
+    <button id="pause">Pause</button>
 </div>
 
 <script type="text/javascript" src="target/scala-2.12/reinforcement-learning-in-scala-fastopt.js"></script>
 <script>
-    GridworldUI.main(document.getElementById('canvas'));
+    GridworldUI.main(
+        document.getElementById('canvas'),
+        document.getElementById('step'),
+        document.getElementById('run'),
+        document.getElementById('pause')
+    );
 </script>
 </body>
 </html>

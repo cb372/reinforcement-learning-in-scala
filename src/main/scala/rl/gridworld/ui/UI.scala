@@ -1,50 +1,127 @@
 package rl.gridworld.ui
 
 import org.scalajs.dom
-
-import scala.util.Random
-import org.scalajs.dom.html.Canvas
+import org.scalajs.dom.html.{Button, Canvas}
+import rl.core.{ActionResult, AgentBehaviour, Environment, QLearning}
+import rl.gridworld.core.GridworldProblem
+import rl.gridworld.core.GridworldProblem.{AgentLocation, Move}
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
-
-case class Point(x: Int, y: Int) {
-  def +(p: Point) = Point(x + p.x, y + p.y)
-  def /(d: Int)   = Point(x / d, y / d)
-}
+import scala.util.Random
 
 @JSExportTopLevel("GridworldUI")
 object UI {
 
+  sealed trait UIState
+  case object Idle     extends UIState
+  case object Stepping extends UIState
+  case object Running  extends UIState
+
+  private val initialState: AgentLocation =
+    GridworldProblem.AgentLocation(Random.nextInt(5), Random.nextInt(5))
+
+  private val initialAgent: QLearning[AgentLocation, Move] =
+    QLearning(α = 0.1, γ = 0.9, ε = 0.2, Q = Map.empty)
+
+  private val env: Environment[AgentLocation, Move] = implicitly
+  private val agentBehaviour: AgentBehaviour[QLearning[AgentLocation, Move], AgentLocation, Move] =
+    implicitly
+
   @JSExport
-  def main(canvas: Canvas): Unit = {
+  def main(canvas: Canvas, stepButton: Button, runButton: Button, pauseButton: Button): Unit = {
+    var uiState: UIState = Idle
+
+    var agent        = initialAgent
+    var currentState = initialState
+
+    def step(): Unit = {
+      val (nextAction, updateAgent) =
+        agentBehaviour.chooseAction(agent, currentState, GridworldProblem.validActions)
+      val (nextState, reward) = env.step(currentState, nextAction)
+
+      agent = updateAgent(ActionResult(reward, nextState))
+      currentState = nextState
+
+      draw(canvas, currentState)
+    }
+
+    def tick(): Unit = uiState match {
+      case Idle =>
+        draw(canvas, currentState)
+
+      case Stepping =>
+        step()
+        uiState = Idle
+
+      case Running =>
+        step()
+    }
+
+    stepButton.onclick = _ => uiState = Stepping
+    runButton.onclick = _ => uiState = Running
+    pauseButton.onclick = _ => uiState = Idle
+
+    dom.window.setInterval(() => tick(), 150)
+  }
+
+  private def draw(canvas: Canvas, agentLocation: AgentLocation): Unit = {
     val ctx = canvas
       .getContext("2d")
       .asInstanceOf[dom.CanvasRenderingContext2D]
 
-    var count   = 0
-    var p       = Point(0, 0)
-    val corners = Seq(Point(255, 255), Point(0, 255), Point(128, 0))
+    val cellWidth  = canvas.width / 5
+    val cellHeight = canvas.height / 5
 
-    def clear() = {
-      ctx.fillStyle = "black"
-      ctx.fillRect(0, 0, 255, 255)
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+    ctx.fillStyle = "black"
+    ctx.lineWidth = 1
+    ctx.font = "30px arial"
+
+    for (i <- 0 until 5) {
+      for (j <- 0 until 5) {
+        ctx.strokeRect(i * cellWidth, j * cellHeight, cellWidth, cellHeight)
+      }
     }
 
-    def run = for (i <- 0 until 10) {
-      if (count % 3000 == 0) clear()
-      count += 1
-      p = (p + corners(Random.nextInt(3))) / 2
+    ctx.fillText("A", cellWidth + 10, 30)
+    ctx.fillText("B", 3 * cellWidth + 10, 30)
+    ctx.fillText("A'", cellWidth + 10, 4 * cellHeight + 30)
+    ctx.fillText("B'", 3 * cellWidth + 10, 2 * cellHeight + 30)
+    drawArrow(ctx, cellWidth + 20, 50, 4 * cellHeight - 10, "+10")
+    drawArrow(ctx, 3 * cellWidth + 20, 50, 2 * cellHeight - 10, "+5")
 
-      val height = 512.0 / (255 + p.y)
-      val r      = (p.x * height).toInt
-      val g      = ((255 - p.x) * height).toInt
-      val b      = p.y
-      ctx.fillStyle = s"rgb($g, $r, $b)"
+    ctx.fillStyle = "red"
 
-      ctx.fillRect(p.x, p.y, 1, 1)
-    }
+    ctx.beginPath()
+    ctx.arc((agentLocation.x + 0.5) * cellWidth,
+            (agentLocation.y + 0.5) * cellHeight,
+            0.2 * cellWidth,
+            0,
+            2 * Math.PI)
+    ctx.fill()
+    ctx.closePath()
+  }
 
-    dom.window.setInterval(() => run, 50)
+  private def drawArrow(ctx: dom.CanvasRenderingContext2D,
+                        x: Int,
+                        fromY: Int,
+                        toY: Int,
+                        text: String): Unit = {
+    val headLength = 10
+
+    ctx.beginPath()
+    ctx.lineWidth = 2
+    ctx.moveTo(x, fromY)
+    ctx.lineTo(x, toY)
+    ctx.lineTo(x - headLength * Math.cos(Math.PI / 3), toY - headLength * Math.sin(Math.PI / 3))
+    ctx.moveTo(x, toY)
+    ctx.lineTo(x - headLength * Math.cos(2 * Math.PI / 3),
+               toY - headLength * Math.sin(2 * Math.PI / 3))
+    ctx.stroke()
+    ctx.closePath()
+
+    ctx.fillText(text, x + 5, (toY + fromY) / 2 + 5)
   }
 
 }

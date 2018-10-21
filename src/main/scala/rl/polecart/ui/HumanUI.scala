@@ -13,7 +13,7 @@ object HumanUI {
   case object Idle    extends UIState
   case object Running extends UIState
 
-  private val initialPoleCartState =
+  private val initialPoleCartState: PoleBalancingProblem.PoleCartState =
     PoleBalancingProblem.PoleCartState(0.0, 0.0, 0.0, 0.0)
 
   @JSExport
