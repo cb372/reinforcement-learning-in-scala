@@ -1,7 +1,7 @@
 package rl.polecart.ui
 
 import org.scalajs.dom
-import org.scalajs.dom.html.Canvas
+import org.scalajs.dom.html.{Canvas, Button}
 import rl.core._
 import rl.polecart.core.PoleBalancingProblem
 import rl.polecart.core.PoleBalancingProblem._
@@ -12,8 +12,10 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 object QLearningUI {
 
   sealed trait UIState
-  case object Idle    extends UIState
-  case object Running extends UIState
+  case object Idle           extends UIState
+  case object Stepping       extends UIState
+  case object RunningEpisode extends UIState
+  case object RunningForever extends UIState
 
   private val initialPoleCartState =
     PoleBalancingProblem.PoleCartState(0.0, 0.0, 0.0, 0.0)
@@ -30,9 +32,12 @@ object QLearningUI {
 
   @JSExport
   def main(document: dom.Document,
-           window: dom.Window,
            canvas: Canvas,
-           infoLabel: dom.Element): Unit = {
+           infoLabel: dom.Element,
+           stepButton: Button,
+           runEpisodeButton: Button,
+           runForeverButton: Button,
+           pauseButton: Button): Unit = {
     var uiState: UIState = Idle
 
     var agent                                             = initialAgent
@@ -41,44 +46,62 @@ object QLearningUI {
     var maxTimeElapsed                                    = 0.0
     var episodeCount                                      = 1
 
+    def step(): Unit = {
+      timeElapsed += 0.02
+
+      val currentState = stateConversion.convertState(poleCartState)
+      val (nextAction, updateAgent) =
+        agentBehaviour.chooseAction(agent, currentState, validActions)
+      val (nextState, reward) = env.step(poleCartState, nextAction)
+
+      agent = updateAgent(ActionResult(reward, stateConversion.convertState(nextState)))
+      poleCartState = nextState
+
+      drawCart(canvas, poleCartState, episodeCount, timeElapsed)
+      updateTable(document, agent.Q)
+    }
+
+    def endOfEpisode(): Unit = {
+      maxTimeElapsed = maxTimeElapsed max timeElapsed
+      timeElapsed = 0.0
+      episodeCount += 1
+      poleCartState = initialPoleCartState
+      infoLabel.textContent = f"Longest episode so far: $maxTimeElapsed%.2f seconds"
+    }
+
     def tick(): Unit = {
       clear(canvas)
 
       uiState match {
         case Idle =>
-          drawCart(canvas, poleCartState, episodeCount = 0, timeElapsed)
-        case Running =>
-          timeElapsed += 0.02
-
-          val currentState = stateConversion.convertState(poleCartState)
-          val (nextAction, updateAgent) =
-            agentBehaviour.chooseAction(agent, currentState, validActions)
-          val (nextState, reward) = env.step(poleCartState, nextAction)
-
-          agent = updateAgent(ActionResult(reward, stateConversion.convertState(nextState)))
-          poleCartState = nextState
-
           drawCart(canvas, poleCartState, episodeCount, timeElapsed)
-          updateTable(document, agent.Q)
 
+        case Stepping =>
+          step()
           if (env.isTerminal(poleCartState)) {
-            maxTimeElapsed = maxTimeElapsed max timeElapsed
-            timeElapsed = 0.0
-            episodeCount += 1
-            startEpisode()
+            endOfEpisode()
+          }
+          uiState = Idle
+
+        case RunningEpisode =>
+          step()
+          if (env.isTerminal(poleCartState)) {
+            endOfEpisode()
+            uiState = Idle
+          }
+
+        case RunningForever =>
+          step()
+          if (env.isTerminal(poleCartState)) {
+            endOfEpisode()
           }
       }
     }
 
-    def startEpisode(): Unit = {
-      infoLabel.textContent = f"Longest episode so far: $maxTimeElapsed%.2f seconds"
-      poleCartState = initialPoleCartState
-      uiState = Running
-    }
-
-    window.onkeydown = _ => startEpisode()
-
-    infoLabel.textContent = "Press any key to start"
+    stepButton.onclick = _ => uiState = Stepping
+    runEpisodeButton.onclick = _ => uiState = RunningEpisode
+    runForeverButton.onclick = _ => uiState = RunningForever
+    pauseButton.onclick = _ => uiState = Idle
 
     dom.window.setInterval(() => tick(), 20)
   }

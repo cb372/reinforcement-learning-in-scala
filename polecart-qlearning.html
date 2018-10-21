@@ -12,290 +12,301 @@
             padding: 5px;
             text-align: left;
         }
+        div {
+            padding: 10px;
+        }
     </style>
 </head>
 <body style="margin: 0px">
 
 <div>
-    <canvas style="display: block; padding: 10px" id="canvas" width="650" height="150"/>
+    <canvas id="canvas" width="650" height="150"/>
+</div>
+
+<div>
+    <button id="step">Step</button>
+    <button id="run-episode">Run one episode</button>
+    <button id="run-forever">Run forever</button>
+    <button id="pause">Pause</button>
 </div>
 
 <div id="info"></div>
 
-<table>
-    <thead>
-        <tr>
-            <th rowspan="3"></th>
-            <th>Cart position</th>
+<div>
+    <table>
+        <thead>
+            <tr>
+                <th rowspan="3"></th>
+                <th>Cart position</th>
 
-            <th colspan="9">Left</th>
-            <th colspan="9">Middle</th>
-            <th colspan="9">Right</th>
-        </tr>
-        <tr>
-            <th>Cart velocity</th>
+                <th colspan="9">Left</th>
+                <th colspan="9">Middle</th>
+                <th colspan="9">Right</th>
+            </tr>
+            <tr>
+                <th>Cart velocity</th>
 
-            <th colspan="3">Fast left</th>
-            <th colspan="3">Slow</th>
-            <th colspan="3">Fast right</th>
+                <th colspan="3">Fast left</th>
+                <th colspan="3">Slow</th>
+                <th colspan="3">Fast right</th>
 
-            <th colspan="3">Fast left</th>
-            <th colspan="3">Slow</th>
-            <th colspan="3">Fast right</th>
+                <th colspan="3">Fast left</th>
+                <th colspan="3">Slow</th>
+                <th colspan="3">Fast right</th>
 
-            <th colspan="3">Fast left</th>
-            <th colspan="3">Slow</th>
-            <th colspan="3">Fast right</th>
-        </tr>
-        <tr>
-            <th>Pole velocity</th>
+                <th colspan="3">Fast left</th>
+                <th colspan="3">Slow</th>
+                <th colspan="3">Fast right</th>
+            </tr>
+            <tr>
+                <th>Pole velocity</th>
 
-            <th colspan="1">Fast left</th>
-            <th colspan="1">Slow</th>
-            <th colspan="1">Fast right</th>
+                <th colspan="1">Fast left</th>
+                <th colspan="1">Slow</th>
+                <th colspan="1">Fast right</th>
 
-            <th colspan="1">Fast left</th>
-            <th colspan="1">Slow</th>
-            <th colspan="1">Fast right</th>
+                <th colspan="1">Fast left</th>
+                <th colspan="1">Slow</th>
+                <th colspan="1">Fast right</th>
 
-            <th colspan="1">Fast left</th>
-            <th colspan="1">Slow</th>
-            <th colspan="1">Fast right</th>
+                <th colspan="1">Fast left</th>
+                <th colspan="1">Slow</th>
+                <th colspan="1">Fast right</th>
 
-            <th colspan="1">Fast left</th>
-            <th colspan="1">Slow</th>
-            <th colspan="1">Fast right</th>
+                <th colspan="1">Fast left</th>
+                <th colspan="1">Slow</th>
+                <th colspan="1">Fast right</th>
 
-            <th colspan="1">Fast left</th>
-            <th colspan="1">Slow</th>
-            <th colspan="1">Fast right</th>
+                <th colspan="1">Fast left</th>
+                <th colspan="1">Slow</th>
+                <th colspan="1">Fast right</th>
 
-            <th colspan="1">Fast left</th>
-            <th colspan="1">Slow</th>
-            <th colspan="1">Fast right</th>
+                <th colspan="1">Fast left</th>
+                <th colspan="1">Slow</th>
+                <th colspan="1">Fast right</th>
 
-            <th colspan="1">Fast left</th>
-            <th colspan="1">Slow</th>
-            <th colspan="1">Fast right</th>
+                <th colspan="1">Fast left</th>
+                <th colspan="1">Slow</th>
+                <th colspan="1">Fast right</th>
 
-            <th colspan="1">Fast left</th>
-            <th colspan="1">Slow</th>
-            <th colspan="1">Fast right</th>
+                <th colspan="1">Fast left</th>
+                <th colspan="1">Slow</th>
+                <th colspan="1">Fast right</th>
 
-            <th colspan="1">Fast left</th>
-            <th colspan="1">Slow</th>
-            <th colspan="1">Fast right</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <th rowspan="6">Pole angle</th>
-            <th>Very left</th>
+                <th colspan="1">Fast left</th>
+                <th colspan="1">Slow</th>
+                <th colspan="1">Fast right</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th rowspan="6">Pole angle</th>
+                <th>Very left</th>
 
-            <td id="left_fastleft_fastleft_veryleft"></td>
-            <td id="left_fastleft_slow_veryleft"></td>
-            <td id="left_fastleft_fastright_veryleft"></td>
-            <td id="left_slow_fastleft_veryleft"></td>
-            <td id="left_slow_slow_veryleft"></td>
-            <td id="left_slow_fastright_veryleft"></td>
-            <td id="left_fastright_fastleft_veryleft"></td>
-            <td id="left_fastright_slow_veryleft"></td>
-            <td id="left_fastright_fastright_veryleft"></td>
-            <td id="middle_fastleft_fastleft_veryleft"></td>
-            <td id="middle_fastleft_slow_veryleft"></td>
-            <td id="middle_fastleft_fastright_veryleft"></td>
-            <td id="middle_slow_fastleft_veryleft"></td>
-            <td id="middle_slow_slow_veryleft"></td>
-            <td id="middle_slow_fastright_veryleft"></td>
-            <td id="middle_fastright_fastleft_veryleft"></td>
-            <td id="middle_fastright_slow_veryleft"></td>
-            <td id="middle_fastright_fastright_veryleft"></td>
-            <td id="right_fastleft_fastleft_veryleft"></td>
-            <td id="right_fastleft_slow_veryleft"></td>
-            <td id="right_fastleft_fastright_veryleft"></td>
-            <td id="right_slow_fastleft_veryleft"></td>
-            <td id="right_slow_slow_veryleft"></td>
-            <td id="right_slow_fastright_veryleft"></td>
-            <td id="right_fastright_fastleft_veryleft"></td>
-            <td id="right_fastright_slow_veryleft"></td>
-        <td id="right_fastright_fastright_veryleft"></td>
-        </tr>
+                <td id="left_fastleft_fastleft_veryleft"></td>
+                <td id="left_fastleft_slow_veryleft"></td>
+                <td id="left_fastleft_fastright_veryleft"></td>
+                <td id="left_slow_fastleft_veryleft"></td>
+                <td id="left_slow_slow_veryleft"></td>
+                <td id="left_slow_fastright_veryleft"></td>
+                <td id="left_fastright_fastleft_veryleft"></td>
+                <td id="left_fastright_slow_veryleft"></td>
+                <td id="left_fastright_fastright_veryleft"></td>
+                <td id="middle_fastleft_fastleft_veryleft"></td>
+                <td id="middle_fastleft_slow_veryleft"></td>
+                <td id="middle_fastleft_fastright_veryleft"></td>
+                <td id="middle_slow_fastleft_veryleft"></td>
+                <td id="middle_slow_slow_veryleft"></td>
+                <td id="middle_slow_fastright_veryleft"></td>
+                <td id="middle_fastright_fastleft_veryleft"></td>
+                <td id="middle_fastright_slow_veryleft"></td>
+                <td id="middle_fastright_fastright_veryleft"></td>
+                <td id="right_fastleft_fastleft_veryleft"></td>
+                <td id="right_fastleft_slow_veryleft"></td>
+                <td id="right_fastleft_fastright_veryleft"></td>
+                <td id="right_slow_fastleft_veryleft"></td>
+                <td id="right_slow_slow_veryleft"></td>
+                <td id="right_slow_fastright_veryleft"></td>
+                <td id="right_fastright_fastleft_veryleft"></td>
+                <td id="right_fastright_slow_veryleft"></td>
+            <td id="right_fastright_fastright_veryleft"></td>
+            </tr>
 
-        <tr>
-            <th>Quite left</th>
+            <tr>
+                <th>Quite left</th>
 
-            <td id="left_fastleft_fastleft_quiteleft"></td>
-            <td id="left_fastleft_slow_quiteleft"></td>
-            <td id="left_fastleft_fastright_quiteleft"></td>
-            <td id="left_slow_fastleft_quiteleft"></td>
-            <td id="left_slow_slow_quiteleft"></td>
-            <td id="left_slow_fastright_quiteleft"></td>
-            <td id="left_fastright_fastleft_quiteleft"></td>
-            <td id="left_fastright_slow_quiteleft"></td>
-            <td id="left_fastright_fastright_quiteleft"></td>
-            <td id="middle_fastleft_fastleft_quiteleft"></td>
-            <td id="middle_fastleft_slow_quiteleft"></td>
-            <td id="middle_fastleft_fastright_quiteleft"></td>
-            <td id="middle_slow_fastleft_quiteleft"></td>
-            <td id="middle_slow_slow_quiteleft"></td>
-            <td id="middle_slow_fastright_quiteleft"></td>
-            <td id="middle_fastright_fastleft_quiteleft"></td>
-            <td id="middle_fastright_slow_quiteleft"></td>
-            <td id="middle_fastright_fastright_quiteleft"></td>
-            <td id="right_fastleft_fastleft_quiteleft"></td>
-            <td id="right_fastleft_slow_quiteleft"></td>
-            <td id="right_fastleft_fastright_quiteleft"></td>
-            <td id="right_slow_fastleft_quiteleft"></td>
-            <td id="right_slow_slow_quiteleft"></td>
-            <td id="right_slow_fastright_quiteleft"></td>
-            <td id="right_fastright_fastleft_quiteleft"></td>
-            <td id="right_fastright_slow_quiteleft"></td>
-            <td id="right_fastright_fastright_quiteleft"></td>
+                <td id="left_fastleft_fastleft_quiteleft"></td>
+                <td id="left_fastleft_slow_quiteleft"></td>
+                <td id="left_fastleft_fastright_quiteleft"></td>
+                <td id="left_slow_fastleft_quiteleft"></td>
+                <td id="left_slow_slow_quiteleft"></td>
+                <td id="left_slow_fastright_quiteleft"></td>
+                <td id="left_fastright_fastleft_quiteleft"></td>
+                <td id="left_fastright_slow_quiteleft"></td>
+                <td id="left_fastright_fastright_quiteleft"></td>
+                <td id="middle_fastleft_fastleft_quiteleft"></td>
+                <td id="middle_fastleft_slow_quiteleft"></td>
+                <td id="middle_fastleft_fastright_quiteleft"></td>
+                <td id="middle_slow_fastleft_quiteleft"></td>
+                <td id="middle_slow_slow_quiteleft"></td>
+                <td id="middle_slow_fastright_quiteleft"></td>
+                <td id="middle_fastright_fastleft_quiteleft"></td>
+                <td id="middle_fastright_slow_quiteleft"></td>
+                <td id="middle_fastright_fastright_quiteleft"></td>
+                <td id="right_fastleft_fastleft_quiteleft"></td>
+                <td id="right_fastleft_slow_quiteleft"></td>
+                <td id="right_fastleft_fastright_quiteleft"></td>
+                <td id="right_slow_fastleft_quiteleft"></td>
+                <td id="right_slow_slow_quiteleft"></td>
+                <td id="right_slow_fastright_quiteleft"></td>
+                <td id="right_fastright_fastleft_quiteleft"></td>
+                <td id="right_fastright_slow_quiteleft"></td>
+                <td id="right_fastright_fastright_quiteleft"></td>
 
-        </tr>
+            </tr>
 
-        <tr>
-            <th>Slightly left</th>
+            <tr>
+                <th>Slightly left</th>
 
-            <td id="left_fastleft_fastleft_slightlyleft"></td>
-            <td id="left_fastleft_slow_slightlyleft"></td>
-            <td id="left_fastleft_fastright_slightlyleft"></td>
-            <td id="left_slow_fastleft_slightlyleft"></td>
-            <td id="left_slow_slow_slightlyleft"></td>
-            <td id="left_slow_fastright_slightlyleft"></td>
-            <td id="left_fastright_fastleft_slightlyleft"></td>
-            <td id="left_fastright_slow_slightlyleft"></td>
-            <td id="left_fastright_fastright_slightlyleft"></td>
-            <td id="middle_fastleft_fastleft_slightlyleft"></td>
-            <td id="middle_fastleft_slow_slightlyleft"></td>
-            <td id="middle_fastleft_fastright_slightlyleft"></td>
-            <td id="middle_slow_fastleft_slightlyleft"></td>
-            <td id="middle_slow_slow_slightlyleft"></td>
-            <td id="middle_slow_fastright_slightlyleft"></td>
-            <td id="middle_fastright_fastleft_slightlyleft"></td>
-            <td id="middle_fastright_slow_slightlyleft"></td>
-            <td id="middle_fastright_fastright_slightlyleft"></td>
-            <td id="right_fastleft_fastleft_slightlyleft"></td>
-            <td id="right_fastleft_slow_slightlyleft"></td>
-            <td id="right_fastleft_fastright_slightlyleft"></td>
-            <td id="right_slow_fastleft_slightlyleft"></td>
-            <td id="right_slow_slow_slightlyleft"></td>
-            <td id="right_slow_fastright_slightlyleft"></td>
-            <td id="right_fastright_fastleft_slightlyleft"></td>
-            <td id="right_fastright_slow_slightlyleft"></td>
-            <td id="right_fastright_fastright_slightlyleft"></td>
-        </tr>
+                <td id="left_fastleft_fastleft_slightlyleft"></td>
+                <td id="left_fastleft_slow_slightlyleft"></td>
+                <td id="left_fastleft_fastright_slightlyleft"></td>
+                <td id="left_slow_fastleft_slightlyleft"></td>
+                <td id="left_slow_slow_slightlyleft"></td>
+                <td id="left_slow_fastright_slightlyleft"></td>
+                <td id="left_fastright_fastleft_slightlyleft"></td>
+                <td id="left_fastright_slow_slightlyleft"></td>
+                <td id="left_fastright_fastright_slightlyleft"></td>
+                <td id="middle_fastleft_fastleft_slightlyleft"></td>
+                <td id="middle_fastleft_slow_slightlyleft"></td>
+                <td id="middle_fastleft_fastright_slightlyleft"></td>
+                <td id="middle_slow_fastleft_slightlyleft"></td>
+                <td id="middle_slow_slow_slightlyleft"></td>
+                <td id="middle_slow_fastright_slightlyleft"></td>
+                <td id="middle_fastright_fastleft_slightlyleft"></td>
+                <td id="middle_fastright_slow_slightlyleft"></td>
+                <td id="middle_fastright_fastright_slightlyleft"></td>
+                <td id="right_fastleft_fastleft_slightlyleft"></td>
+                <td id="right_fastleft_slow_slightlyleft"></td>
+                <td id="right_fastleft_fastright_slightlyleft"></td>
+                <td id="right_slow_fastleft_slightlyleft"></td>
+                <td id="right_slow_slow_slightlyleft"></td>
+                <td id="right_slow_fastright_slightlyleft"></td>
+                <td id="right_fastright_fastleft_slightlyleft"></td>
+                <td id="right_fastright_slow_slightlyleft"></td>
+                <td id="right_fastright_fastright_slightlyleft"></td>
+            </tr>
 
-        <tr>
-            <th>Slightly right</th>
+            <tr>
+                <th>Slightly right</th>
 
-            <td id="left_fastleft_fastleft_slightlyright"></td>
-            <td id="left_fastleft_slow_slightlyright"></td>
-            <td id="left_fastleft_fastright_slightlyright"></td>
-            <td id="left_slow_fastleft_slightlyright"></td>
-            <td id="left_slow_slow_slightlyright"></td>
-            <td id="left_slow_fastright_slightlyright"></td>
-            <td id="left_fastright_fastleft_slightlyright"></td>
-            <td id="left_fastright_slow_slightlyright"></td>
-            <td id="left_fastright_fastright_slightlyright"></td>
-            <td id="middle_fastleft_fastleft_slightlyright"></td>
-            <td id="middle_fastleft_slow_slightlyright"></td>
-            <td id="middle_fastleft_fastright_slightlyright"></td>
-            <td id="middle_slow_fastleft_slightlyright"></td>
-            <td id="middle_slow_slow_slightlyright"></td>
-            <td id="middle_slow_fastright_slightlyright"></td>
-            <td id="middle_fastright_fastleft_slightlyright"></td>
-            <td id="middle_fastright_slow_slightlyright"></td>
-            <td id="middle_fastright_fastright_slightlyright"></td>
-            <td id="right_fastleft_fastleft_slightlyright"></td>
-            <td id="right_fastleft_slow_slightlyright"></td>
-            <td id="right_fastleft_fastright_slightlyright"></td>
-            <td id="right_slow_fastleft_slightlyright"></td>
-            <td id="right_slow_slow_slightlyright"></td>
-            <td id="right_slow_fastright_slightlyright"></td>
-            <td id="right_fastright_fastleft_slightlyright"></td>
-            <td id="right_fastright_slow_slightlyright"></td>
-            <td id="right_fastright_fastright_slightlyright"></td>
-        </tr>
+                <td id="left_fastleft_fastleft_slightlyright"></td>
+                <td id="left_fastleft_slow_slightlyright"></td>
+                <td id="left_fastleft_fastright_slightlyright"></td>
+                <td id="left_slow_fastleft_slightlyright"></td>
+                <td id="left_slow_slow_slightlyright"></td>
+                <td id="left_slow_fastright_slightlyright"></td>
+                <td id="left_fastright_fastleft_slightlyright"></td>
+                <td id="left_fastright_slow_slightlyright"></td>
+                <td id="left_fastright_fastright_slightlyright"></td>
+                <td id="middle_fastleft_fastleft_slightlyright"></td>
+                <td id="middle_fastleft_slow_slightlyright"></td>
+                <td id="middle_fastleft_fastright_slightlyright"></td>
+                <td id="middle_slow_fastleft_slightlyright"></td>
+                <td id="middle_slow_slow_slightlyright"></td>
+                <td id="middle_slow_fastright_slightlyright"></td>
+                <td id="middle_fastright_fastleft_slightlyright"></td>
+                <td id="middle_fastright_slow_slightlyright"></td>
+                <td id="middle_fastright_fastright_slightlyright"></td>
+                <td id="right_fastleft_fastleft_slightlyright"></td>
+                <td id="right_fastleft_slow_slightlyright"></td>
+                <td id="right_fastleft_fastright_slightlyright"></td>
+                <td id="right_slow_fastleft_slightlyright"></td>
+                <td id="right_slow_slow_slightlyright"></td>
+                <td id="right_slow_fastright_slightlyright"></td>
+                <td id="right_fastright_fastleft_slightlyright"></td>
+                <td id="right_fastright_slow_slightlyright"></td>
+                <td id="right_fastright_fastright_slightlyright"></td>
+            </tr>
 
-        <tr>
-            <th>Quite right</th>
+            <tr>
+                <th>Quite right</th>
 
-            <td id="left_fastleft_fastleft_quiteright"></td>
-            <td id="left_fastleft_slow_quiteright"></td>
-            <td id="left_fastleft_fastright_quiteright"></td>
-            <td id="left_slow_fastleft_quiteright"></td>
-            <td id="left_slow_slow_quiteright"></td>
-            <td id="left_slow_fastright_quiteright"></td>
-            <td id="left_fastright_fastleft_quiteright"></td>
-            <td id="left_fastright_slow_quiteright"></td>
-            <td id="left_fastright_fastright_quiteright"></td>
-            <td id="middle_fastleft_fastleft_quiteright"></td>
-            <td id="middle_fastleft_slow_quiteright"></td>
-            <td id="middle_fastleft_fastright_quiteright"></td>
-            <td id="middle_slow_fastleft_quiteright"></td>
-            <td id="middle_slow_slow_quiteright"></td>
-            <td id="middle_slow_fastright_quiteright"></td>
-            <td id="middle_fastright_fastleft_quiteright"></td>
-            <td id="middle_fastright_slow_quiteright"></td>
-            <td id="middle_fastright_fastright_quiteright"></td>
-            <td id="right_fastleft_fastleft_quiteright"></td>
-            <td id="right_fastleft_slow_quiteright"></td>
-            <td id="right_fastleft_fastright_quiteright"></td>
-            <td id="right_slow_fastleft_quiteright"></td>
-            <td id="right_slow_slow_quiteright"></td>
-            <td id="right_slow_fastright_quiteright"></td>
-            <td id="right_fastright_fastleft_quiteright"></td>
-            <td id="right_fastright_slow_quiteright"></td>
-            <td id="right_fastright_fastright_quiteright"></td>
-        </tr>
+                <td id="left_fastleft_fastleft_quiteright"></td>
+                <td id="left_fastleft_slow_quiteright"></td>
+                <td id="left_fastleft_fastright_quiteright"></td>
+                <td id="left_slow_fastleft_quiteright"></td>
+                <td id="left_slow_slow_quiteright"></td>
+                <td id="left_slow_fastright_quiteright"></td>
+                <td id="left_fastright_fastleft_quiteright"></td>
+                <td id="left_fastright_slow_quiteright"></td>
+                <td id="left_fastright_fastright_quiteright"></td>
+                <td id="middle_fastleft_fastleft_quiteright"></td>
+                <td id="middle_fastleft_slow_quiteright"></td>
+                <td id="middle_fastleft_fastright_quiteright"></td>
+                <td id="middle_slow_fastleft_quiteright"></td>
+                <td id="middle_slow_slow_quiteright"></td>
+                <td id="middle_slow_fastright_quiteright"></td>
+                <td id="middle_fastright_fastleft_quiteright"></td>
+                <td id="middle_fastright_slow_quiteright"></td>
+                <td id="middle_fastright_fastright_quiteright"></td>
+                <td id="right_fastleft_fastleft_quiteright"></td>
+                <td id="right_fastleft_slow_quiteright"></td>
+                <td id="right_fastleft_fastright_quiteright"></td>
+                <td id="right_slow_fastleft_quiteright"></td>
+                <td id="right_slow_slow_quiteright"></td>
+                <td id="right_slow_fastright_quiteright"></td>
+                <td id="right_fastright_fastleft_quiteright"></td>
+                <td id="right_fastright_slow_quiteright"></td>
+                <td id="right_fastright_fastright_quiteright"></td>
+            </tr>
 
-        <tr>
-            <th>Very right</th>
+            <tr>
+                <th>Very right</th>
 
-            <td id="left_fastleft_fastleft_veryright"></td>
-            <td id="left_fastleft_slow_veryright"></td>
-            <td id="left_fastleft_fastright_veryright"></td>
-            <td id="left_slow_fastleft_veryright"></td>
-            <td id="left_slow_slow_veryright"></td>
-            <td id="left_slow_fastright_veryright"></td>
-            <td id="left_fastright_fastleft_veryright"></td>
-            <td id="left_fastright_slow_veryright"></td>
-            <td id="left_fastright_fastright_veryright"></td>
-            <td id="middle_fastleft_fastleft_veryright"></td>
-            <td id="middle_fastleft_slow_veryright"></td>
-            <td id="middle_fastleft_fastright_veryright"></td>
-            <td id="middle_slow_fastleft_veryright"></td>
-            <td id="middle_slow_slow_veryright"></td>
-            <td id="middle_slow_fastright_veryright"></td>
-            <td id="middle_fastright_fastleft_veryright"></td>
-            <td id="middle_fastright_slow_veryright"></td>
-            <td id="middle_fastright_fastright_veryright"></td>
-            <td id="right_fastleft_fastleft_veryright"></td>
-            <td id="right_fastleft_slow_veryright"></td>
-            <td id="right_fastleft_fastright_veryright"></td>
-            <td id="right_slow_fastleft_veryright"></td>
-            <td id="right_slow_slow_veryright"></td>
-            <td id="right_slow_fastright_veryright"></td>
-            <td id="right_fastright_fastleft_veryright"></td>
-            <td id="right_fastright_slow_veryright"></td>
-            <td id="right_fastright_fastright_veryright"></td>
-        </tr>
+                <td id="left_fastleft_fastleft_veryright"></td>
+                <td id="left_fastleft_slow_veryright"></td>
+                <td id="left_fastleft_fastright_veryright"></td>
+                <td id="left_slow_fastleft_veryright"></td>
+                <td id="left_slow_slow_veryright"></td>
+                <td id="left_slow_fastright_veryright"></td>
+                <td id="left_fastright_fastleft_veryright"></td>
+                <td id="left_fastright_slow_veryright"></td>
+                <td id="left_fastright_fastright_veryright"></td>
+                <td id="middle_fastleft_fastleft_veryright"></td>
+                <td id="middle_fastleft_slow_veryright"></td>
+                <td id="middle_fastleft_fastright_veryright"></td>
+                <td id="middle_slow_fastleft_veryright"></td>
+                <td id="middle_slow_slow_veryright"></td>
+                <td id="middle_slow_fastright_veryright"></td>
+                <td id="middle_fastright_fastleft_veryright"></td>
+                <td id="middle_fastright_slow_veryright"></td>
+                <td id="middle_fastright_fastright_veryright"></td>
+                <td id="right_fastleft_fastleft_veryright"></td>
+                <td id="right_fastleft_slow_veryright"></td>
+                <td id="right_fastleft_fastright_veryright"></td>
+                <td id="right_slow_fastleft_veryright"></td>
+                <td id="right_slow_slow_veryright"></td>
+                <td id="right_slow_fastright_veryright"></td>
+                <td id="right_fastright_fastleft_veryright"></td>
+                <td id="right_fastright_slow_veryright"></td>
+                <td id="right_fastright_fastright_veryright"></td>
+            </tr>
 
-    </tbody>
-
-
-
-
-</table>
+        </tbody>
+    </table>
+</div>
 
 <script type="text/javascript" src="target/scala-2.12/reinforcement-learning-in-scala-fastopt.js"></script>
 <script>
     PolecartQLearningUI.main(
         document,
-        window,
         document.getElementById('canvas'),
-        document.getElementById('info')
+        document.getElementById('info'),
+        document.getElementById('step'),
+        document.getElementById('run-episode'),
+        document.getElementById('run-forever'),
+        document.getElementById('pause')
     );
 </script>
 </body>
