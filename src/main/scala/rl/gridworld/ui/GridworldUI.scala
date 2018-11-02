@@ -10,7 +10,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.util.Random
 
 @JSExportTopLevel("GridworldUI")
-object UI {
+object GridworldUI {
 
   sealed trait UIState
   case object Idle     extends UIState
@@ -18,7 +18,7 @@ object UI {
   case object Running  extends UIState
 
   private val initialState: AgentLocation =
-    GridworldProblem.AgentLocation(Random.nextInt(5), Random.nextInt(5))
+    AgentLocation(Random.nextInt(5), Random.nextInt(5))
 
   private val initialAgent: QLearning[AgentLocation, Move] =
     QLearning(α = 0.1, γ = 0.9, ε = 0.2, Q = Map.empty)
@@ -28,7 +28,11 @@ object UI {
     implicitly
 
   @JSExport
-  def main(canvas: Canvas, stepButton: Button, runButton: Button, pauseButton: Button): Unit = {
+  def main(document: dom.Document,
+           canvas: Canvas,
+           stepButton: Button,
+           runButton: Button,
+           pauseButton: Button): Unit = {
     var uiState: UIState = Idle
 
     var agent        = initialAgent
@@ -42,12 +46,12 @@ object UI {
       agent = updateAgent(ActionResult(reward, nextState))
       currentState = nextState
 
-      draw(canvas, currentState)
+      draw(document, canvas, agent, currentState)
     }
 
     def tick(): Unit = uiState match {
       case Idle =>
-        draw(canvas, currentState)
+        draw(document, canvas, agent, currentState)
 
       case Stepping =>
         step()
@@ -64,7 +68,10 @@ object UI {
     dom.window.setInterval(() => tick(), 150)
   }
 
-  private def draw(canvas: Canvas, agentLocation: AgentLocation): Unit = {
+  private def draw(document: dom.Document,
+                   canvas: Canvas,
+                   agent: QLearning[AgentLocation, Move],
+                   agentLocation: AgentLocation): Unit = {
     val ctx = canvas
       .getContext("2d")
       .asInstanceOf[dom.CanvasRenderingContext2D]
@@ -101,6 +108,8 @@ object UI {
             2 * Math.PI)
     ctx.fill()
     ctx.closePath()
+
+    updateTable(document, agent.Q)
   }
 
   private def drawArrow(ctx: dom.CanvasRenderingContext2D,
@@ -123,5 +132,30 @@ object UI {
 
     ctx.fillText(text, x + 5, (toY + fromY) / 2 + 5)
   }
+
+  private def updateTable(
+                           document: dom.Document,
+                           Q: Map[AgentLocation, Map[Move, Double]])
+  : Unit = {
+    for {
+      x <- 0 to 4
+      y <- 0 to 4
+    } {
+      val actionValues = Q.getOrElse(AgentLocation(x, y), Map.empty)
+
+      val text = {
+        val descendingActionValues = actionValues.groupBy(_._2).toList.sortBy(_._1).reverse
+        if (descendingActionValues.length < 2) {
+          "??"
+        } else {
+          descendingActionValues.head._2.map(_._1.toString.head).toList.sorted.mkString
+        }
+      }
+
+      val id = s"${x}_$y"
+      document.getElementById(id).innerHTML = text
+    }
+  }
+
 
 }

@@ -29,9 +29,52 @@
     <button id="pause">Pause</button>
 </div>
 
+<div>Policy:</div>
+
+<div>
+    <table>
+        <tr>
+            <td id="0_0"></td>
+            <td id="1_0"></td>
+            <td id="2_0"></td>
+            <td id="3_0"></td>
+            <td id="4_0"></td>
+        </tr>
+        <tr>
+            <td id="0_1"></td>
+            <td id="1_1"></td>
+            <td id="2_1"></td>
+            <td id="3_1"></td>
+            <td id="4_1"></td>
+        </tr>
+        <tr>
+            <td id="0_2"></td>
+            <td id="1_2"></td>
+            <td id="2_2"></td>
+            <td id="3_2"></td>
+            <td id="4_2"></td>
+        </tr>
+        <tr>
+            <td id="0_3"></td>
+            <td id="1_3"></td>
+            <td id="2_3"></td>
+            <td id="3_3"></td>
+            <td id="4_3"></td>
+        </tr>
+        <tr>
+            <td id="0_4"></td>
+            <td id="1_4"></td>
+            <td id="2_4"></td>
+            <td id="3_4"></td>
+            <td id="4_4"></td>
+        </tr>
+    </table>
+</div>
+
 <script type="text/javascript" src="target/scala-2.12/reinforcement-learning-in-scala-fastopt.js"></script>
 <script>
     GridworldUI.main(
+        document,
         document.getElementById('canvas'),
         document.getElementById('step'),
         document.getElementById('run'),
