@@ -21,7 +21,7 @@ object GridworldUI {
     AgentLocation(Random.nextInt(5), Random.nextInt(5))
 
   private val initialAgentData: QLearning[AgentLocation, Move] =
-    QLearning(α = 0.1, γ = 0.9, ε = 0.2, Q = Map.empty)
+    QLearning(α = 0.1, γ = 0.9, ε = 0.4, Q = Map.empty)
 
   private val env: Environment[AgentLocation, Move] = implicitly
   private val agentBehaviour: AgentBehaviour[QLearning[AgentLocation, Move], AgentLocation, Move] =
