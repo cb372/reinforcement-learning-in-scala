@@ -21,7 +21,7 @@ object QLearningUI {
     PoleBalancingProblem.PoleCartState(0.0, 0.0, 0.0, 0.0)
 
   private val initialAgentData: QLearning[RoughPoleCartState, PushCart] =
-    QLearning(α = 0.1, γ = 1.0, ε = 0.1, Q = Map.empty)
+    QLearning(α = 0.1, γ = 1.0, ε = 0.1, epsilonDecay = 1.0, Q = Map.empty)
 
   private val env: Environment[PoleCartState, PushCart]                           = implicitly
   private val stateConversion: StateConversion[PoleCartState, RoughPoleCartState] = implicitly

@@ -6,6 +6,7 @@ case class QLearning[State, Action](
     α: Double, // step size, 0.0 ≦ α ≦ 1.0, controls how much the agent updates its action-value function Q(s, a)
     γ: Double, // discount rate, 0.0 ≦ γ ≦ 1.0, controls how much the one-step backup affects Q(s, a)
     ε: Double, // 0.0 ≦ ε ≦ 1.0, probability of choosing a random action
+    epsilonDecay: Double, // ≦ 1.0, multiplier for ε at every time step
     Q: Map[State, Map[Action, Double]] // the estimated action-value function Q(s, a)
 )
 
@@ -40,7 +41,9 @@ object QLearning {
             val updatedActionValues = actionValues + (chosenAction -> updatedActionValue)
             val updatedQ            = agentData.Q + (state         -> updatedActionValues)
 
-            agentData.copy(Q = updatedQ)
+            val updatedEpsilon = agentData.ε * agentData.epsilonDecay
+
+            agentData.copy(Q = updatedQ, ε = updatedEpsilon)
         }
 
         (chosenAction, updateStateActionValue)

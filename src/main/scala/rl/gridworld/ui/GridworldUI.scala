@@ -21,7 +21,7 @@ object GridworldUI {
     AgentLocation(Random.nextInt(5), Random.nextInt(5))
 
   private val initialAgentData: QLearning[AgentLocation, Move] =
-    QLearning(α = 0.1, γ = 0.9, ε = 0.2, Q = Map.empty)
+    QLearning(α = 0.1, γ = 0.9, ε = 0.5, epsilonDecay = 0.999, Q = Map.empty)
 
   private val env: Environment[AgentLocation, Move] = implicitly
   private val agentBehaviour: AgentBehaviour[QLearning[AgentLocation, Move], AgentLocation, Move] =
@@ -110,6 +110,7 @@ object GridworldUI {
     ctx.closePath()
 
     updateTable(document, agentData.Q)
+    updateEpsilon(document, agentData.ε)
   }
 
   private def drawArrow(ctx: dom.CanvasRenderingContext2D,
@@ -153,6 +154,10 @@ object GridworldUI {
       val id = s"${x}_$y"
       document.getElementById(id).innerHTML = text
     }
+  }
+
+  private def updateEpsilon(document: dom.Document, ε: Double): Unit = {
+    document.getElementById("epsilon").innerHTML = ε.toString
   }
 
 }
