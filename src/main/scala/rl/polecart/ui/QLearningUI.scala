@@ -20,7 +20,7 @@ object QLearningUI {
   private val initialPoleCartState: PoleCartState =
     PoleBalancingProblem.PoleCartState(0.0, 0.0, 0.0, 0.0)
 
-  private val initialAgent: QLearning[RoughPoleCartState, PushCart] =
+  private val initialAgentData: QLearning[RoughPoleCartState, PushCart] =
     QLearning(α = 0.1, γ = 1.0, ε = 0.1, Q = Map.empty)
 
   private val env: Environment[PoleCartState, PushCart]                           = implicitly
@@ -39,7 +39,7 @@ object QLearningUI {
            pauseButton: Button): Unit = {
     var uiState: UIState = Idle
 
-    var agent                                             = initialAgent
+    var agentData                                         = initialAgentData
     var poleCartState: PoleBalancingProblem.PoleCartState = initialPoleCartState
     var timeElapsed                                       = 0.0
     var maxTimeElapsed                                    = 0.0
@@ -50,14 +50,14 @@ object QLearningUI {
 
       val currentState = stateConversion.convertState(poleCartState)
       val (nextAction, updateAgent) =
-        agentBehaviour.chooseAction(agent, currentState, validActions)
+        agentBehaviour.chooseAction(agentData, currentState, validActions)
       val (nextState, reward) = env.step(poleCartState, nextAction)
 
-      agent = updateAgent(ActionResult(reward, stateConversion.convertState(nextState)))
+      agentData = updateAgent(ActionResult(reward, stateConversion.convertState(nextState)))
       poleCartState = nextState
 
       drawCart(canvas, poleCartState, episodeCount, timeElapsed)
-      updateTable(document, agent.Q)
+      updateTable(document, agentData.Q)
     }
 
     def endOfEpisode(): Unit = {

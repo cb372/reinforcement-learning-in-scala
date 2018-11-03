@@ -20,7 +20,7 @@ object GridworldUI {
   private val initialState: AgentLocation =
     AgentLocation(Random.nextInt(5), Random.nextInt(5))
 
-  private val initialAgent: QLearning[AgentLocation, Move] =
+  private val initialAgentData: QLearning[AgentLocation, Move] =
     QLearning(α = 0.1, γ = 0.9, ε = 0.2, Q = Map.empty)
 
   private val env: Environment[AgentLocation, Move] = implicitly
@@ -35,23 +35,23 @@ object GridworldUI {
            pauseButton: Button): Unit = {
     var uiState: UIState = Idle
 
-    var agent        = initialAgent
+    var agentData    = initialAgentData
     var currentState = initialState
 
     def step(): Unit = {
       val (nextAction, updateAgent) =
-        agentBehaviour.chooseAction(agent, currentState, GridworldProblem.validActions)
+        agentBehaviour.chooseAction(agentData, currentState, GridworldProblem.validActions)
       val (nextState, reward) = env.step(currentState, nextAction)
 
-      agent = updateAgent(ActionResult(reward, nextState))
+      agentData = updateAgent(ActionResult(reward, nextState))
       currentState = nextState
 
-      draw(document, canvas, agent, currentState)
+      updateUI(document, canvas, agentData, currentState)
     }
 
     def tick(): Unit = uiState match {
       case Idle =>
-        draw(document, canvas, agent, currentState)
+        updateUI(document, canvas, agentData, currentState)
 
       case Stepping =>
         step()
@@ -68,10 +68,10 @@ object GridworldUI {
     dom.window.setInterval(() => tick(), 150)
   }
 
-  private def draw(document: dom.Document,
-                   canvas: Canvas,
-                   agent: QLearning[AgentLocation, Move],
-                   agentLocation: AgentLocation): Unit = {
+  private def updateUI(document: dom.Document,
+                       canvas: Canvas,
+                       agentData: QLearning[AgentLocation, Move],
+                       agentLocation: AgentLocation): Unit = {
     val ctx = canvas
       .getContext("2d")
       .asInstanceOf[dom.CanvasRenderingContext2D]
@@ -109,7 +109,7 @@ object GridworldUI {
     ctx.fill()
     ctx.closePath()
 
-    updateTable(document, agent.Q)
+    updateTable(document, agentData.Q)
   }
 
   private def drawArrow(ctx: dom.CanvasRenderingContext2D,
@@ -133,10 +133,8 @@ object GridworldUI {
     ctx.fillText(text, x + 5, (toY + fromY) / 2 + 5)
   }
 
-  private def updateTable(
-                           document: dom.Document,
-                           Q: Map[AgentLocation, Map[Move, Double]])
-  : Unit = {
+  private def updateTable(document: dom.Document,
+                          Q: Map[AgentLocation, Map[Move, Double]]): Unit = {
     for {
       x <- 0 to 4
       y <- 0 to 4
@@ -156,6 +154,5 @@ object GridworldUI {
       document.getElementById(id).innerHTML = text
     }
   }
-
 
 }

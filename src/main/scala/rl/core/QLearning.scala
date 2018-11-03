@@ -16,31 +16,31 @@ object QLearning {
     new AgentBehaviour[QLearning[State, Action], State, Action] {
 
       def chooseAction(
-          agent: QLearning[State, Action],
+          agentData: QLearning[State, Action],
           state: State,
           validActions: List[Action]): (Action, ActionResult[State] => QLearning[State, Action]) = {
         // Get Q(s, {a}), or initialise it arbitrarily to 0 for all actions if not initialised yet
-        val actionValues = agent.Q.getOrElse(state, validActions.map(_ -> 0.0).toMap)
+        val actionValues = agentData.Q.getOrElse(state, validActions.map(_ -> 0.0).toMap)
 
         // choose the next action
-        val (chosenAction, currentActionValue) = epsilonGreedy(actionValues, agent.ε)
+        val (chosenAction, currentActionValue) = epsilonGreedy(actionValues, agentData.ε)
 
         // learn!
         val updateStateActionValue: ActionResult[State] => QLearning[State, Action] = {
           actionResult =>
             val nextStateActionValues =
-              agent.Q.getOrElse(actionResult.nextState, validActions.map(_ -> 0.0).toMap)
+              agentData.Q.getOrElse(actionResult.nextState, validActions.map(_ -> 0.0).toMap)
             val maxNextStateActionValue =
               nextStateActionValues.values.fold(Double.MinValue)(_ max _)
 
             // Q(s_t, a_t) <- Q(s_t, a_t) + α (r_t+1 + γ max_a Q(s_t+1, a) - Q(s_t, a_t)
             val updatedActionValue =
-              currentActionValue + agent.α * (actionResult.reward + agent.γ * maxNextStateActionValue - currentActionValue)
+              currentActionValue + agentData.α * (actionResult.reward + agentData.γ * maxNextStateActionValue - currentActionValue)
 
             val updatedActionValues = actionValues + (chosenAction -> updatedActionValue)
-            val updatedQ            = agent.Q + (state             -> updatedActionValues)
+            val updatedQ            = agentData.Q + (state         -> updatedActionValues)
 
-            agent.copy(Q = updatedQ)
+            agentData.copy(Q = updatedQ)
         }
 
         (chosenAction, updateStateActionValue)
