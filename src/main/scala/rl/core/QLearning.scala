@@ -33,7 +33,7 @@ object QLearning {
             val maxNextStateActionValue =
               nextStateActionValues.values.fold(Double.MinValue)(_ max _)
 
-            // Q(s_t, a_t) <- Q(s_t, a_t) + α (r_t+1 + γ max_a Q(s_t+1, a) - Q(s_t, a_t)
+            // Q(s_t, a_t) <- Q(s_t, a_t) + α (r_t+1 + γ max_a Q(s_t+1, a) - Q(s_t, a_t))
             val updatedActionValue =
               currentActionValue + agentData.α * (actionResult.reward + agentData.γ * maxNextStateActionValue - currentActionValue)
 

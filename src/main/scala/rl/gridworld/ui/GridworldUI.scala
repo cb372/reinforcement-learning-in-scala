@@ -21,7 +21,7 @@ object GridworldUI {
     AgentLocation(Random.nextInt(5), Random.nextInt(5))
 
   private val initialAgentData: QLearning[AgentLocation, Move] =
-    QLearning(α = 0.1, γ = 0.9, ε = 0.4, Q = Map.empty)
+    QLearning(α = 0.9, γ = 0.9, ε = 0.4, Q = Map.empty)
 
   private val env: Environment[AgentLocation, Move] = implicitly
   private val agentBehaviour: AgentBehaviour[QLearning[AgentLocation, Move], AgentLocation, Move] =
@@ -109,7 +109,7 @@ object GridworldUI {
     ctx.fill()
     ctx.closePath()
 
-    updateTable(document, agentData.Q)
+    updateTables(document, agentData.Q)
   }
 
   private def drawArrow(ctx: dom.CanvasRenderingContext2D,
@@ -133,7 +133,7 @@ object GridworldUI {
     ctx.fillText(text, x + 5, (toY + fromY) / 2 + 5)
   }
 
-  private def updateTable(document: dom.Document,
+  private def updateTables(document: dom.Document,
                           Q: Map[AgentLocation, Map[Move, Double]]): Unit = {
     for {
       x <- 0 to 4
@@ -141,7 +141,19 @@ object GridworldUI {
     } {
       val actionValues = Q.getOrElse(AgentLocation(x, y), Map.empty)
 
-      val text = {
+      val Qtext = {
+        GridworldProblem.validActions
+          .map { move =>
+            val paddedMove = move.toString.padTo(5, ' ').replaceAllLiterally(" ", "&nbsp;")
+            val actionValue = actionValues.getOrElse(move, 0.0)
+            f"$paddedMove: $actionValue%.4f"
+          }
+          .mkString("<br/>")
+      }
+
+      document.getElementById(s"Q_${x}_$y").innerHTML = Qtext
+
+      val policyText = {
         val descendingActionValues = actionValues.groupBy(_._2).toList.sortBy(_._1).reverse
         if (descendingActionValues.length < 2) {
           "??"
@@ -150,8 +162,7 @@ object GridworldUI {
         }
       }
 
-      val id = s"${x}_$y"
-      document.getElementById(id).innerHTML = text
+      document.getElementById(s"policy_${x}_$y").innerHTML = policyText
     }
   }
 
