@@ -241,7 +241,9 @@ object PacmanProblem {
     case object ChasingGhostsNotMuchTime  extends AgentMode
   }
 
-  // Note: the agent doesn't bother tracking where the remaining food is
+  // Note: the agent doesn't bother tracking where the remaining food is.
+  // TODO: really it should track food in some way, as it relates to reward,
+  // but not sure how to do so without exploding the state space even further.
   case class AgentState(
       ghosts: Set[AgentGhostLocation],
       pacman: Location,

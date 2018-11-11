@@ -4,14 +4,14 @@ import org.scalajs.dom
 import org.scalajs.dom.html
 import rl.core._
 import rl.pacman.core.PacmanProblem._
+import rl.pacman.training.QKeyValue
 
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 @JSExportTopLevel("PacmanUI")
 object PacmanUI {
-
-  private val initialAgentData: QLearning[AgentState, Move] =
-    QLearning(α = 0.1, γ = 0.9, ε = 0.1, Q = Map.empty)
 
   private val env: Environment[GameState, Move]                       = implicitly
   private val stateConversion: StateConversion[GameState, AgentState] = implicitly
@@ -19,30 +19,56 @@ object PacmanUI {
     implicitly
 
   @JSExport
-  def main(document: dom.Document, canvas: html.Canvas): Unit = {
-    var agentData            = initialAgentData
-    var gameState: GameState = initialState
-    var episode              = 1
+  def main(document: dom.Document, canvas: html.Canvas, info: html.Div): Unit = {
+    loadQ(info).map { Q =>
+      info.innerHTML = "Loaded Q data."
 
-    def step(): Unit = {
-      val currentState = stateConversion.convertState(gameState)
-      val possibleActions = env.possibleActions(gameState)
-      val (nextAction, updateAgent) =
-        agentBehaviour.chooseAction(agentData, currentState, possibleActions)
-      val (nextState, reward) = env.step(gameState, nextAction)
+      val initialAgentData: QLearning[AgentState, Move] =
+        QLearning(α = 0.1, γ = 0.9, ε = 0.1, Q = Q)
 
-      agentData = updateAgent(ActionResult(reward, stateConversion.convertState(nextState)))
-      gameState = nextState
+      var agentData            = initialAgentData
+      var gameState: GameState = initialState
+      var episode              = 1
 
-      drawGame(canvas, gameState, nextAction)
+      def step(): Unit = {
+        val currentState    = stateConversion.convertState(gameState)
+        val possibleActions = env.possibleActions(gameState)
+        val (nextAction, updateAgent) =
+          agentBehaviour.chooseAction(agentData, currentState, possibleActions)
+        val (nextState, reward) = env.step(gameState, nextAction)
 
-      if (env.isTerminal(gameState)) {
-        episode += 1
-        gameState = initialState
+        agentData = updateAgent(ActionResult(reward, stateConversion.convertState(nextState)))
+        gameState = nextState
+
+        drawGame(canvas, gameState, nextAction)
+
+        if (env.isTerminal(gameState)) {
+          episode += 1
+          gameState = initialState
+        }
       }
+
+      dom.window.setInterval(() => step(), 500)
     }
 
-    dom.window.setInterval(() => step(), 500)
+  }
+
+  private def loadQ(info: html.Div): Future[Map[AgentState, Map[Move, Double]]] = {
+    info.innerHTML = "Downloading ridiculously large JSON file..."
+
+    dom.ext.Ajax.get("Q.json").flatMap { r =>
+      info.innerHTML = "Parsing ridiculously large JSON file..."
+
+      import io.circe.parser._
+      val either = for {
+        json <- parse(r.responseText)
+        decoded <- json.as[List[QKeyValue]]
+      } yield {
+        decoded.map(kv => (kv.key, kv.value)).toMap
+      }
+
+      Future.fromTry(either.toTry)
+    }
   }
 
   private def drawGame(canvas: html.Canvas, state: GameState, actionTaken: Move): Unit = {

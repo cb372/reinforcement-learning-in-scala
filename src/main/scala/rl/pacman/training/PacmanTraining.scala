@@ -1,8 +1,12 @@
-package rl.pacman.core
+package rl.pacman.training
+import java.nio.file.{Files, Paths}
+import java.time.Instant
+
 import rl.core._
-import rl.pacman.core.PacmanProblem._
+import rl.pacman.core.PacmanProblem.{AgentState, GameState, Move, initialState}
 
 import scala.collection.mutable
+import scala.scalajs.niocharset.StandardCharsets
 
 object PacmanTraining extends App {
 
@@ -26,8 +30,16 @@ object PacmanTraining extends App {
   private var agentData            = initialAgentData
   private var gameState: GameState = initialState
 
-  def step(): Unit = {
-    val currentState        = stateConversion.convertState(gameState)
+  val trainingDir = Paths.get(s"pacman-training/${Instant.now()}")
+  Files.createDirectories(trainingDir)
+  Files.write(
+    trainingDir.resolve("parameters.txt"),
+    s"alpha = ${initialAgentData.α}, gamma = ${initialAgentData.γ}, epsilon = ${initialAgentData.ε}"
+      .getBytes(StandardCharsets.UTF_8)
+  )
+
+  private def step(): Unit = {
+    val currentState    = stateConversion.convertState(gameState)
     val possibleActions = env.possibleActions(gameState)
     val (nextAction, updateAgent) =
       agentBehaviour.chooseAction(agentData, currentState, possibleActions)
@@ -59,7 +71,7 @@ object PacmanTraining extends App {
     }
   }
 
-  def report(): Unit = {
+  private def report(): Unit = {
     println(s"t = $t")
     println(s"Completed episodes = $episodes")
     println(s"Longest episode so far = $longestEpisode")
@@ -68,16 +80,28 @@ object PacmanTraining extends App {
     println(s"Won ${recentResults.count(identity)} of the last 10,000 games")
     println(s"State space size = ${agentData.Q.size}")
     println()
+
+    saveQValues()
+  }
+
+  private def saveQValues(): Unit = {
+    val list: List[QKeyValue] = agentData.Q.map { case (k, v) => QKeyValue(k, v) }.toList
+
+    import io.circe.syntax._
+    val json = list.asJson
+
+    Files.write(
+      trainingDir.resolve(s"Q-after-$t-steps.json"),
+      json.noSpaces.getBytes(StandardCharsets.UTF_8)
+    )
   }
 
   while (true) {
     step()
 
-    if (t % 1000000 == 0) {
+    if (t % 10000000 == 0) {
       report()
     }
   }
-
-  // TODO every million time steps, print out some stats about episode length and print the agent's Q to a file
 
 }
