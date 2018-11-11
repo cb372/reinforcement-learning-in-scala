@@ -26,23 +26,14 @@ object PacmanProblem {
     case class ChaseGhosts(timeRemaining: Int) extends Mode { val chasingGhosts = true  }
   }
 
-  sealed trait GameState
-  sealed trait Terminal extends GameState
-
-  object GameState {
-
-    case class Normal(
-        ghost1: Location,
-        ghost2: Location,
-        pacman: Location,
-        food: Set[Location],
-        pills: Set[Location],
-        mode: Mode
-    ) extends GameState
-
-    case object Lost extends Terminal
-    case object Won  extends Terminal
-  }
+  case class GameState(
+      ghost1: Location,
+      ghost2: Location,
+      pacman: Location,
+      food: Set[Location],
+      pills: Set[Location],
+      mode: Mode
+  )
 
   sealed trait Move
   object Move {
@@ -98,7 +89,7 @@ object PacmanProblem {
       Set(xy(1, 5), xy(2, 5), xy(3, 5), xy(4, 5), xy(5, 5), xy(6, 5), xy(7, 5), xy(8, 5), xy(10, 5), xy(11, 5), xy(12, 5), xy(13, 5), xy(14, 5), xy(15, 5), xy(16, 5), xy(17, 5), xy(18, 5))
   // format: on
 
-  val initialState: GameState.Normal = GameState.Normal(
+  val initialState: GameState = GameState(
     ghost1 = initialGhost1,
     ghost2 = initialGhost2,
     pacman = initialPacman,
@@ -110,17 +101,9 @@ object PacmanProblem {
   implicit val environment: Environment[GameState, Move] =
     new Environment[GameState, Move] {
 
-      override def step(currentState: GameState, actionTaken: Move): (GameState, Reward) =
-        currentState match {
-          case normal: GameState.Normal => stepNormalState(normal, actionTaken)
-          case terminal                 => (terminal, 0.0)
-        }
-
-      private def stepNormalState(currentState: GameState.Normal,
-                                  actionTaken: Move): (GameState, Reward) = {
-
+      override def step(currentState: GameState, actionTaken: Move): (GameState, Reward) = {
         // Calculate Pacman's new location, based on actionTaken and adjacent walls.
-        val nextPacmanLocation = nextLocation(currentState.pacman, actionTaken)
+        val nextPacmanLocation = updatePacmanLocation(currentState.pacman, actionTaken)
 
         // Calculate ghosts' new locations, based on their current locations and directions.
         val nextGhost1 = updateGhost(currentState.ghost1, nextPacmanLocation, currentState.mode)
@@ -172,21 +155,14 @@ object PacmanProblem {
         val pacmanCaughtByGhost  = pacmanTouchingAGhost && !updatedMode.chasingGhosts
         val pacmanCaughtAGhost   = pacmanTouchingAGhost && updatedMode.chasingGhosts
 
-        val nextState = {
-          if (pacmanCaughtByGhost)
-            GameState.Lost
-          else if (updatedFoodLocations.isEmpty)
-            GameState.Won
-          else
-            GameState.Normal(
-              ghost1 = updatedGhost1,
-              ghost2 = updatedGhost2,
-              pacman = nextPacmanLocation,
-              food = updatedFoodLocations,
-              pills = updatedPillLocations,
-              mode = updatedMode
-            )
-        }
+        val nextState = GameState(
+          ghost1 = updatedGhost1,
+          ghost2 = updatedGhost2,
+          pacman = nextPacmanLocation,
+          food = updatedFoodLocations,
+          pills = updatedPillLocations,
+          mode = updatedMode
+        )
 
         val reward = {
           if (pacmanCaughtByGhost)
@@ -204,16 +180,19 @@ object PacmanProblem {
         (nextState, reward)
       }
 
-      override def isTerminal(state: GameState): Boolean = state match {
-        case _: Terminal => true
-        case _           => false
+      override def isTerminal(state: GameState): Boolean =
+        state.food.isEmpty || isGameOver(state)
+
+      private def isGameOver(state: GameState): Boolean = {
+        val pacmanTouchingGhost = state.pacman == state.ghost1 || state.pacman == state.ghost2
+        pacmanTouchingGhost && !state.mode.chasingGhosts
       }
 
-      private def nextLocation(currentLocation: Location, move: Move): Location = {
-        val next = currentLocation.move(move)
+      private def updatePacmanLocation(pacman: Location, move: Move): Location = {
+        val next = pacman.move(move)
         if (walls.contains(next))
           // can't move into a wall, so stay where you are
-          currentLocation
+          pacman
         else
           next
       }

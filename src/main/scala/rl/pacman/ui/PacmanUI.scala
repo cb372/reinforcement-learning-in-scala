@@ -3,7 +3,6 @@ package rl.pacman.ui
 import org.scalajs.dom
 import org.scalajs.dom.html
 import rl.core._
-import rl.pacman.core.PacmanProblem
 import rl.pacman.core.PacmanProblem._
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
@@ -34,22 +33,18 @@ object PacmanUI {
       agentData = updateAgent(ActionResult(reward, stateConversion.convertState(nextState)))
       gameState = nextState
 
-      gameState match {
-        case normal: GameState.Normal =>
-          drawGame(canvas, normal, nextAction)
-        case GameState.Won | GameState.Lost =>
-          episode += 1
-          gameState = initialState
-          drawGame(canvas, initialState, nextAction)
+      drawGame(canvas, gameState, nextAction)
+
+      if (env.isTerminal(gameState)) {
+        episode += 1
+        gameState = initialState
       }
     }
 
     dom.window.setInterval(() => step(), 500)
   }
 
-  private def drawGame(canvas: html.Canvas,
-                       state: PacmanProblem.GameState.Normal,
-                       actionTaken: Move): Unit = {
+  private def drawGame(canvas: html.Canvas, state: GameState, actionTaken: Move): Unit = {
     val ctx         = canvas.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]
     val pixelWidth  = 50
     val pixelHeight = 50
