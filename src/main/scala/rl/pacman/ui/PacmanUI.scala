@@ -2,7 +2,6 @@ package rl.pacman.ui
 
 import org.scalajs.dom
 import org.scalajs.dom.html
-import org.scalajs.dom.html.{Button, Canvas}
 import rl.core._
 import rl.pacman.core.PacmanProblem
 import rl.pacman.core.PacmanProblem._
@@ -21,9 +20,10 @@ object PacmanUI {
     implicitly
 
   @JSExport
-  def main(document: dom.Document, canvas: Canvas): Unit = {
-    var agentData      = initialAgentData
-    var gameState  = initialState
+  def main(document: dom.Document, canvas: html.Canvas): Unit = {
+    var agentData            = initialAgentData
+    var gameState: GameState = initialState
+    var episode              = 1
 
     def step(): Unit = {
       val currentState = stateConversion.convertState(gameState)
@@ -35,23 +35,29 @@ object PacmanUI {
       gameState = nextState
 
       gameState match {
-        case normal: GameState.Normal => drawGame(canvas, normal, nextAction)
-        case _ => // don't repaint after game for now
+        case normal: GameState.Normal =>
+          drawGame(canvas, normal, nextAction)
+        case GameState.Won | GameState.Lost =>
+          episode += 1
+          gameState = initialState
+          drawGame(canvas, initialState, nextAction)
       }
     }
 
     dom.window.setInterval(() => step(), 500)
   }
 
-  private def drawGame(canvas: html.Canvas, state: PacmanProblem.GameState.Normal, actionTaken: Move): Unit = {
-    val ctx = canvas.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]
-    val pixelWidth = 50
+  private def drawGame(canvas: html.Canvas,
+                       state: PacmanProblem.GameState.Normal,
+                       actionTaken: Move): Unit = {
+    val ctx         = canvas.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]
+    val pixelWidth  = 50
     val pixelHeight = 50
 
-    def drawGhost(ghost: Ghost, colour: String): Unit = {
+    def drawGhost(ghost: Location, colour: String): Unit = {
       ctx.beginPath()
       ctx.fillStyle = colour
-      ctx.arc(ghost.location.x * pixelWidth + 25, ghost.location.y * pixelHeight + 25, 20, 0.0, Math.PI * 2.0)
+      ctx.arc(ghost.x * pixelWidth + 25, ghost.y * pixelHeight + 25, 20, 0.0, Math.PI * 2.0)
       ctx.fill()
       ctx.closePath()
     }
@@ -62,7 +68,10 @@ object PacmanUI {
     // draw walls
     for (wall <- walls) {
       ctx.fillStyle = "blue"
-      ctx.fillRect(wall.x * pixelWidth + 10, wall.y * pixelHeight + 10, pixelWidth - 20, pixelHeight - 20)
+      ctx.fillRect(wall.x * pixelWidth + 10,
+                   wall.y * pixelHeight + 10,
+                   pixelWidth - 20,
+                   pixelHeight - 20)
     }
 
     // draw food
@@ -95,18 +104,21 @@ object PacmanUI {
 
     // draw pacman
     val (startAngle, endAngle) = actionTaken match {
-      case Move.Left => (Math.PI * -0.8, Math.PI * 0.8)
-      case Move.Up => (Math.PI * -0.3, Math.PI * 1.3)
+      case Move.Left  => (Math.PI * -0.8, Math.PI * 0.8)
+      case Move.Up    => (Math.PI * -0.3, Math.PI * 1.3)
       case Move.Right => (Math.PI * 0.2, Math.PI * 1.8)
-      case Move.Down => (Math.PI * 0.7, Math.PI * 2.3)
+      case Move.Down  => (Math.PI * 0.7, Math.PI * 2.3)
     }
     ctx.beginPath()
     ctx.fillStyle = "yellow"
-    ctx.arc(state.pacman.x * pixelWidth + 25, state.pacman.y * pixelHeight + 25, 20.0, startAngle, endAngle)
+    ctx.arc(state.pacman.x * pixelWidth + 25,
+            state.pacman.y * pixelHeight + 25,
+            20.0,
+            startAngle,
+            endAngle)
     ctx.lineTo(state.pacman.x * pixelWidth + 25, state.pacman.y * pixelHeight + 25)
     ctx.closePath()
     ctx.fill()
   }
-
 
 }
