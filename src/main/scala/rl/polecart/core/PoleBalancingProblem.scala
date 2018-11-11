@@ -26,10 +26,13 @@ object PoleBalancingProblem {
     case object Right extends PushCart
   }
 
-  val validActions: List[PushCart] = List(PushCart.Left, PushCart.Right)
+  val allActions: List[PushCart] = List(PushCart.Left, PushCart.Right)
 
   implicit val environment: Environment[PoleCartState, PushCart] =
     new Environment[PoleCartState, PushCart] {
+
+      override def possibleActions(currentState: PoleCartState): List[PushCart] =
+        PoleBalancingProblem.allActions
 
       override def step(currentState: PoleCartState,
                         actionTaken: PushCart): (PoleCartState, Reward) = {

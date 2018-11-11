@@ -43,7 +43,7 @@ object PacmanProblem {
     case object Right extends Move
   }
 
-  val validActions: List[Move] = List(Move.Up, Move.Down, Move.Left, Move.Right)
+  val allActions: List[Move] = List(Move.Up, Move.Down, Move.Left, Move.Right)
 
   /*
   We use the following "smallClassic" grid:
@@ -100,6 +100,9 @@ object PacmanProblem {
 
   implicit val environment: Environment[GameState, Move] =
     new Environment[GameState, Move] {
+
+      override def possibleActions(currentState: GameState): List[Move] =
+        allActions.filterNot(move => walls.contains(currentState.pacman.move(move)))
 
       override def step(currentState: GameState, actionTaken: Move): (GameState, Reward) = {
         // Calculate Pacman's new location, based on actionTaken and adjacent walls.
@@ -200,7 +203,7 @@ object PacmanProblem {
       private def updateGhost(ghost: Location, pacman: Location, mode: Mode): Location = {
         val smartMoveProb = 0.8
 
-        val validPositions = validActions.map(ghost.move).filterNot(walls.contains)
+        val validPositions = allActions.map(ghost.move).filterNot(walls.contains)
 
         if (Random.nextDouble() < smartMoveProb) {
           val sortedByDistance = validPositions
@@ -257,8 +260,8 @@ object PacmanProblem {
 
     val mode = gameState.mode match {
       case Mode.ChaseGhosts(t) if t >= 10 => AgentMode.ChasingGhostsPlentyOfTime
-      case Mode.ChaseGhosts(_) => AgentMode.ChasingGhostsNotMuchTime
-      case Mode.Normal => AgentMode.RunAway
+      case Mode.ChaseGhosts(_)            => AgentMode.ChasingGhostsNotMuchTime
+      case Mode.Normal                    => AgentMode.RunAway
     }
 
     AgentState(

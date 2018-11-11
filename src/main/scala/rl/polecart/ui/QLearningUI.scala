@@ -50,7 +50,7 @@ object QLearningUI {
 
       val currentState = stateConversion.convertState(poleCartState)
       val (nextAction, updateAgent) =
-        agentBehaviour.chooseAction(agentData, currentState, validActions)
+        agentBehaviour.chooseAction(agentData, currentState, allActions)
       val (nextState, reward) = env.step(poleCartState, nextAction)
 
       agentData = updateAgent(ActionResult(reward, stateConversion.convertState(nextState)))

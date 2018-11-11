@@ -15,10 +15,13 @@ object GridworldProblem {
     case object Right extends Move
   }
 
-  val validActions: List[Move] = List(Move.Up, Move.Down, Move.Left, Move.Right)
+  val allActions: List[Move] = List(Move.Up, Move.Down, Move.Left, Move.Right)
 
   implicit val environment: Environment[AgentLocation, Move] =
     new Environment[AgentLocation, Move] {
+
+      override def possibleActions(currentState: AgentLocation): List[Move] =
+        GridworldProblem.allActions
 
       override def step(currentLocation: AgentLocation,
                         actionTaken: Move): (AgentLocation, Reward) = currentLocation match {

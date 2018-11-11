@@ -13,7 +13,7 @@ object PacmanUI {
   private val initialAgentData: QLearning[AgentState, Move] =
     QLearning(α = 0.1, γ = 0.9, ε = 0.1, Q = Map.empty)
 
-  private val env: Environment[GameState, Move]                      = implicitly
+  private val env: Environment[GameState, Move]                       = implicitly
   private val stateConversion: StateConversion[GameState, AgentState] = implicitly
   private val agentBehaviour: AgentBehaviour[QLearning[AgentState, Move], AgentState, Move] =
     implicitly
@@ -26,8 +26,9 @@ object PacmanUI {
 
     def step(): Unit = {
       val currentState = stateConversion.convertState(gameState)
+      val possibleActions = env.possibleActions(gameState)
       val (nextAction, updateAgent) =
-        agentBehaviour.chooseAction(agentData, currentState, validActions)
+        agentBehaviour.chooseAction(agentData, currentState, possibleActions)
       val (nextState, reward) = env.step(gameState, nextAction)
 
       agentData = updateAgent(ActionResult(reward, stateConversion.convertState(nextState)))

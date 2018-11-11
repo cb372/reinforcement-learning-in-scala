@@ -40,7 +40,7 @@ object GridworldUI {
 
     def step(): Unit = {
       val (nextAction, updateAgent) =
-        agentBehaviour.chooseAction(agentData, currentState, GridworldProblem.validActions)
+        agentBehaviour.chooseAction(agentData, currentState, GridworldProblem.allActions)
       val (nextState, reward) = env.step(currentState, nextAction)
 
       agentData = updateAgent(ActionResult(reward, nextState))
@@ -142,7 +142,7 @@ object GridworldUI {
       val actionValues = Q.getOrElse(AgentLocation(x, y), Map.empty)
 
       val Qtext = {
-        GridworldProblem.validActions
+        GridworldProblem.allActions
           .map { move =>
             val paddedMove  = move.toString.padTo(5, ' ').replaceAllLiterally(" ", "&nbsp;")
             val actionValue = actionValues.getOrElse(move, 0.0)
