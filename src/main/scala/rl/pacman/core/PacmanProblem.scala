@@ -220,15 +220,53 @@ object PacmanProblem {
         }
       }
 
-      private def manhattanDist(from: Location, to: Location): Int =
-        Math.abs(from.x - to.x) + Math.abs(from.y - to.y)
-
     }
 
-  // TODO define agent state and conversion
+  private def manhattanDist(from: Location, to: Location): Int =
+    Math.abs(from.x - to.x) + Math.abs(from.y - to.y)
 
-  implicit val stateConversion: StateConversion[GameState, GameState] = {
-    identity[GameState]
+  sealed trait AgentGhostLocation
+  object AgentGhostLocation {
+    case object FarAway                   extends AgentGhostLocation
+    case class Nearby(location: Location) extends AgentGhostLocation
+  }
+
+  sealed trait AgentMode
+  object AgentMode {
+    case object RunAway                   extends AgentMode
+    case object ChasingGhostsPlentyOfTime extends AgentMode
+    case object ChasingGhostsNotMuchTime  extends AgentMode
+  }
+
+  // Note: the agent doesn't bother tracking where the remaining food is
+  case class AgentState(
+      ghosts: Set[AgentGhostLocation],
+      pacman: Location,
+      pills: Set[Location],
+      mode: AgentMode
+  )
+
+  implicit val stateConversion: StateConversion[GameState, AgentState] = { gameState =>
+    def convertGhost(ghost: Location): AgentGhostLocation =
+      if (manhattanDist(ghost, gameState.pacman) >= 10)
+        AgentGhostLocation.FarAway
+      else
+        AgentGhostLocation.Nearby(ghost)
+
+    val ghosts = Set(convertGhost(gameState.ghost1), convertGhost(gameState.ghost2))
+
+    val mode = gameState.mode match {
+      case Mode.ChaseGhosts(t) if t >= 10 => AgentMode.ChasingGhostsPlentyOfTime
+      case Mode.ChaseGhosts(_) => AgentMode.ChasingGhostsNotMuchTime
+      case Mode.Normal => AgentMode.RunAway
+    }
+
+    AgentState(
+      ghosts,
+      gameState.pacman,
+      gameState.pills,
+      mode
+    )
   }
 
 }

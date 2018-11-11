@@ -10,12 +10,12 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 @JSExportTopLevel("PacmanUI")
 object PacmanUI {
 
-  private val initialAgentData: QLearning[GameState, Move] =
-    QLearning(α = 0.1, γ = 1.0, ε = 0.1, Q = Map.empty)
+  private val initialAgentData: QLearning[AgentState, Move] =
+    QLearning(α = 0.1, γ = 0.9, ε = 0.1, Q = Map.empty)
 
   private val env: Environment[GameState, Move]                      = implicitly
-  private val stateConversion: StateConversion[GameState, GameState] = implicitly
-  private val agentBehaviour: AgentBehaviour[QLearning[GameState, Move], GameState, Move] =
+  private val stateConversion: StateConversion[GameState, AgentState] = implicitly
+  private val agentBehaviour: AgentBehaviour[QLearning[AgentState, Move], AgentState, Move] =
     implicitly
 
   @JSExport
