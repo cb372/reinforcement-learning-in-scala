@@ -39,11 +39,11 @@ object QLearningUI {
            pauseButton: Button): Unit = {
     var uiState: UIState = Idle
 
-    var agentData                                         = initialAgentData
-    var poleCartState: PoleBalancingProblem.PoleCartState = initialPoleCartState
-    var timeElapsed                                       = 0.0
-    var maxTimeElapsed                                    = 0.0
-    var episodeCount                                      = 1
+    var agentData      = initialAgentData
+    var poleCartState  = initialPoleCartState
+    var timeElapsed    = 0.0
+    var maxTimeElapsed = 0.0
+    var episodeCount   = 1
 
     def step(): Unit = {
       timeElapsed += 0.02

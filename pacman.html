@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pacman</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 5px;
+            text-align: left;
+        }
+        div {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body style="margin: 0px">
+
+<div>
+    <canvas style="display: block" id="canvas" width="1000" height="350"/>
+</div>
+
+<script type="text/javascript" src="target/scala-2.12/reinforcement-learning-in-scala-fastopt.js"></script>
+<script>
+    PacmanUI.main(
+        document,
+        document.getElementById('canvas')
+    );
+</script>
+</body>
+</html>

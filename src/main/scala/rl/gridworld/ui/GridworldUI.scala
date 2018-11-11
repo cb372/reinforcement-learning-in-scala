@@ -134,7 +134,7 @@ object GridworldUI {
   }
 
   private def updateTables(document: dom.Document,
-                          Q: Map[AgentLocation, Map[Move, Double]]): Unit = {
+                           Q: Map[AgentLocation, Map[Move, Double]]): Unit = {
     for {
       x <- 0 to 4
       y <- 0 to 4
@@ -144,7 +144,7 @@ object GridworldUI {
       val Qtext = {
         GridworldProblem.validActions
           .map { move =>
-            val paddedMove = move.toString.padTo(5, ' ').replaceAllLiterally(" ", "&nbsp;")
+            val paddedMove  = move.toString.padTo(5, ' ').replaceAllLiterally(" ", "&nbsp;")
             val actionValue = actionValues.getOrElse(move, 0.0)
             f"$paddedMove: $actionValue%.4f"
           }
