@@ -81,10 +81,13 @@ object PacmanTraining extends App {
     println(s"State space size = ${agentData.Q.size}")
     println()
 
-    saveQValues()
+    if (t % 50000000 == 0) {
+      saveQValues()
+    }
   }
 
   private def saveQValues(): Unit = {
+    print("Saving Q values to file... ")
     val list: List[QKeyValue] = agentData.Q.map { case (k, v) => QKeyValue(k, v) }.toList
 
     import io.circe.syntax._
@@ -94,6 +97,7 @@ object PacmanTraining extends App {
       trainingDir.resolve(s"Q-after-$t-steps.json"),
       json.noSpaces.getBytes(StandardCharsets.UTF_8)
     )
+    println("Done.")
   }
 
   while (true) {

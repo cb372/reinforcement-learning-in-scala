@@ -170,8 +170,8 @@ object PacmanProblem {
         val reward = {
           if (pacmanCaughtByGhost)
             -100.0
-          else if (ateFood)
-            1.0
+          //else if (ateFood) TODO for now we don't reward food, so the agent doesn't need to track it in its state space
+          //  1.0
           else if (atePill)
             10.0
           else if (pacmanCaughtAGhost)
@@ -201,25 +201,30 @@ object PacmanProblem {
       }
 
       private def updateGhost(ghost: Location, pacman: Location, mode: Mode): Location = {
-        val smartMoveProb = 0.8
-
-        val validPositions = allActions.map(ghost.move).filterNot(walls.contains)
-
-        if (Random.nextDouble() < smartMoveProb) {
-          val sortedByDistance = validPositions
-            .map(location => (location, manhattanDist(location, pacman)))
-            .sortBy {
-              case (_, distance) =>
-                if (mode.chasingGhosts)
-                  distance * -1 // the further from Pacman the better
-                else
-                  distance // the closer the better
-            }
-          val bestDistance  = sortedByDistance.head._2
-          val bestPositions = sortedByDistance.takeWhile(_._2 == bestDistance)
-          Random.shuffle(bestPositions).head._1
+        if (ghost == pacman && !mode.chasingGhosts) {
+          // if you've caught Pacman, stay where you are!
+          ghost
         } else {
-          Random.shuffle(validPositions).head
+          val smartMoveProb = 0.8
+
+          val validPositions = allActions.map(ghost.move).filterNot(walls.contains)
+
+          if (Random.nextDouble() < smartMoveProb) {
+            val sortedByDistance = validPositions
+              .map(location => (location, manhattanDist(location, pacman)))
+              .sortBy {
+                case (_, distance) =>
+                  if (mode.chasingGhosts)
+                    distance * -1 // the further from Pacman the better
+                  else
+                    distance // the closer the better
+              }
+            val bestDistance  = sortedByDistance.head._2
+            val bestPositions = sortedByDistance.takeWhile(_._2 == bestDistance)
+            Random.shuffle(bestPositions).head._1
+          } else {
+            Random.shuffle(validPositions).head
+          }
         }
       }
 
