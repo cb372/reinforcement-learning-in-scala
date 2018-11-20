@@ -20,6 +20,14 @@ object GridworldUI {
   private val initialState: AgentLocation =
     AgentLocation(Random.nextInt(5), Random.nextInt(5))
 
+  /*
+   Note: because this is a continuous (non-episodic) problem,
+   we use discounting, i.e. we set γ to less than 1.
+
+   This ensures that Q-values will converge to a fixed value
+   even though the agent continues moving around the grid
+   and accruing rewards forever.
+   */
   private val initialAgentData: QLearning[AgentLocation, Move] =
     QLearning(α = 0.9, γ = 0.9, ε = 0.4, Q = Map.empty)
 

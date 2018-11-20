@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reinforcement Learning in Scala</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
+        integrity="sha256-9mbkOfVho3ZPXfM7W8sV2SndrGDuh7wuyLjtsWeTI1Q="
+        crossorigin="anonymous" />
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"
+          integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+          crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"
+          integrity="sha256-t8GepnyPmw9t+foMh3mKNvcorqNHamSKtKRxxpUEgFI="
+          crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="ui menu">
+    <div class="header item">RL in Scala</div>
+    <a class="item" href="gridworld.html">Gridworld</a>
+    <div class="ui simple dropdown item">
+      Pole balancing
+      <i class="dropdown icon"></i>
+      <div class="menu">
+        <a class="item" href="polecart-human.html">Try it yourself</a>
+        <a class="item" href="polecart-qlearning.html">Watch it learn</a>
+      </div>
+    </div>
+    <a class="item" href="pacman.html">Pacman</a>
+    <div class="right menu">
+      <a class="item" href="https://slides.com/cb372/reinforcement-learning-in-scala">Slides</a>
+      <a class="item" href="https://github.com/cb372/reinforcement-learning-in-scala">
+        <i class="github icon"></i>
+        Source code
+      </a>
+    </div>
+  </div>
+
+  <div class="ui text container">
+    <h1 class="ui header">Reinforcement Learning in Scala</h1>
+
+    <p>This site contains the demos for my 'Reinforcement Learning in Scala' talk.</p>
+
+    <h2>Links</h2>
+
+    <p>The slides for the talk are available <a href="https://slides.com/cb372/reinforcement-learning-in-scala">here</a>.</p>
+
+    <p>The source code for all the demos is available <a href="https://github.com/cb372/reinforcement-learning-in-scala">on GitHub</a>.</p>
+
+    <h2>Demos</h2>
+
+    <p>
+      There are 3 demos, all of which use the same RL algorithm known as Q-learning.
+    </p>
+
+    <div class="ui top attached tabular menu">
+      <a class="item active" data-tab="first">Gridworld</a>
+      <a class="item" data-tab="second">Pole balancing</a>
+      <a class="item" data-tab="third">Pacman</a>
+    </div>
+
+    <div class="ui bottom attached tab segment active" data-tab="first">
+      <p>This is a continous (non-episodic) problem with very simple rules:</p>
+      <ul>
+        <li>The agent (the red dot on the grid) can move up, down, left or right.</li>
+        <li>If the agent tries to leave the edge of the grid, it stays in the same cell and gets a reward of -1.</li>
+        <li>If the agent is in cell <code>A</code> and moves in any direction, it jumps to <code>A'</code> and gets a reward of 10.</li>
+        <li>If the agent is in cell <code>B</code> and moves in any direction, it jumps to <code>B'</code> and gets a reward of 5.</li>
+        <li>In all other cases, it gets no reward for moving around the grid.</li>
+      </ul>
+      <p>
+        Of course, the optimal policy is to always move towards <code>A</code> in order to pick up the reward of 10.
+        If you run the demo, you should see the agent gradually learn this policy.
+      </p>
+      <p>
+        It may get stuck in a local minimum (i.e. preferring the <code>B</code> cell) for a while,
+        but it is guaranteed to eventually converge on the optimal policy.
+        This is because the agent constantly explores the state space using the ε-greedy algorithm.
+      </p>
+      <p>
+        The big table under the grid shows the agent's current <code>Q(s, a)</code> for all state-action pairs.
+        This is the estimate that the agent holds for being in state <code>s</code> and taking action <code>a</code>.
+      </p>
+      <p>
+        The smaller table at the bottom of the page shows the same information summarised as a policy.
+        In other words, for a given state, what action(s) the agent currently believes to be the best.
+      </p>
+    </div>
+
+    <div class="ui bottom attached tab segment" data-tab="second">
+      <p>This episodic problem is a classic in RL literature.</p>
+
+      <p>
+        At every time step the agent must push the cart either to the left or the right.
+        The goal is to stop the pole from toppling too far either to the left or the right,
+        whilst also ensuring the cart does not crash into the walls.
+      </p>
+
+      <p>The rules are as follows:</p>
+      <ul>
+        <li>If the pole topples more than 12&deg; from vertical, the agent gets a reward of -1 and the episode ends.</li>
+        <li>If the cart hits the left or right wall, the agent gets a reward of -1 and the episode ends.</li>
+        <li>In all other cases, the agent gets no reward.</li>
+      </ul>
+
+      <p>
+        It's fascinating to see how quickly the agent learns, especially bearing in mind:
+      </p>
+      <ol>
+        <li>
+          Q-learning is a model-free algorithm, so the agent has no idea of the problem it's solving.
+          It doesn't know anything about poles, carts, angular velocities, and so on.
+          All it knows is that it has to pick one of two actions at every time step.
+        </li>
+        <li>
+          The amount of feedback from the environment is very small. All the agent gets is a negative reward
+          at the end of the episode.
+        </li>
+      </ol>
+
+      <p>
+        To get a feel for the problem, you might want to <a class="mini ui primary button" href="polecart-human.html">try it yourself</a> first.
+        Use the Left and Right arrow keys on your keyboard to move the cart.
+      </p>
+
+      <p>
+        Next you can <a class="mini ui primary button" href="polecart-qlearning.html">watch the agent learn</a>.
+        Use the buttons to run through a single time step, a single episode or continously.
+      </p>
+    </div>
+
+    <div class="ui bottom attached tab segment" data-tab="third">
+      <p>This one is an exercise for the reader.</p>
+
+      <p>
+        The demo shows a very "dumb" agent. Its state space is enormous, so it has no chance of doing any meaningful learning.
+      </p>
+
+      <p>
+        See if you can improve the agent by redesigning its state space and putting it through some training.
+      </p>
+
+      <p>
+        Take a look at <a href="https://github.com/cb372/reinforcement-learning-in-scala">the README</a> for more details.
+      </p>
+    </div>
+
+  </div>
+
+  <script>
+    $('.menu .item').tab();
+  </script>
+</body>
+</html>
+
+
