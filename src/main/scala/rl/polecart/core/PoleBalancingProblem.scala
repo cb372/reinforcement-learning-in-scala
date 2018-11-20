@@ -1,6 +1,6 @@
 package rl.polecart.core
 
-import rl.core.{Environment, QLearning, Reward, StateConversion}
+import rl.core.{Environment, Reward, StateConversion}
 import java.lang.Math._
 
 object PoleBalancingProblem {
@@ -37,28 +37,29 @@ object PoleBalancingProblem {
       override def step(currentState: PoleCartState,
                         actionTaken: PushCart): (PoleCartState, Reward) = {
         /*
-      First we use non-linear differential equations to calculate the double derivatives
-      x'' and θ'' of the cart position (x) and pole angle (θ) at time t,
-      given x, θ, x' and θ' at time t.
+        First we use non-linear differential equations to calculate the double derivatives
+        x'' and θ'' of the cart position (x) and pole angle (θ) at time t,
+        given x, θ, x' and θ' at time t.
 
-      See the appendix of the paper "Neuronlike Adaptive Elements That Can Solve Difficult Learning Problems"
-      (Barto, Sutton and Anderson, 1983) for the details of the differential equations.
+        See the appendix of the paper "Neuronlike Adaptive Elements That Can Solve Difficult Learning Problems"
+        (Barto, Sutton and Anderson, 1983) for the details of the differential equations.
 
-      Once we have x'' and θ'' at time t, we use Euler's method (with a time step of 0.02 seconds)
-      to estimate x' and θ' at time t+1:
+        Once we have x'' and θ'' at time t, we use Euler's method (with a time step of 0.02 seconds)
+        to estimate x' and θ' at time t+1:
 
-      x'(t+1) = x'(t) + 0.02 * x''(t)
-      θ'(t+1) = θ'(t) + 0.02 * θ''(t)
+        x'(t+1) = x'(t) + 0.02 * x''(t)
+        θ'(t+1) = θ'(t) + 0.02 * θ''(t)
 
-      We also use Euler's method to estimate x and θ at time t+1 given x, θ, x' and θ' at time t:
+        We also use Euler's method to estimate x and θ at time t+1 given x, θ, x' and θ' at time t:
 
-      x(t+1) = x(t) + 0.02 * x'(t)
-      θ(t+1) = θ(t) + 0.02 * θ'(t)
+        x(t+1) = x(t) + 0.02 * x'(t)
+        θ(t+1) = θ(t) + 0.02 * θ'(t)
 
-      This gives us the new state.
-      The reward is simple: 0 if non-terminal, -1 if terminal.
+        This gives us the new state.
+        The reward is simple: 0 if non-terminal, -1 if terminal.
          */
 
+        // The values for these constants are also taken from the Barton, Sutton and Anderson paper
         val g   = -9.8     // m/s^2, acceleration due to gravity
         val m_c = 1.0      // kg, mass of cart
         val m   = 0.1      // kg, mass of pole
@@ -68,7 +69,8 @@ object PoleBalancingProblem {
         val F = actionTaken match {
           case PushCart.Left =>
             -10.0 // Newtons, force applied to cart's centre of mass
-          case PushCart.Right => 10.0
+          case PushCart.Right =>
+            10.0
         }
 
         val x_t    = currentState.cartPosition
@@ -104,6 +106,7 @@ object PoleBalancingProblem {
         (nextState, reward)
       }
 
+      // Episode ends in failure if pole topples too far or cart hits either of the walls
       override def isTerminal(state: PoleCartState): Boolean = {
         val absPosition     = Math.abs(state.cartPosition)
         val absAngleDegrees = toDegrees(Math.abs(state.poleAngle))

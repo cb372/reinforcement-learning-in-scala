@@ -8,10 +8,23 @@ import rl.pacman.core.PacmanProblem.{AgentState, GameState, Move, initialState}
 import scala.collection.mutable
 import scala.scalajs.niocharset.StandardCharsets
 
+/**
+  * This is a training harness for your Pacman agent.
+  * It makes the agent play a lot of episodes very quickly.
+  *
+  * Every million time steps it will print out some stats about the agent's progress.
+  *
+  * Every 5 million time steps it will save the agent's Q-values to a JSON file
+  * in a format suitable for loading by the Pacman UI.
+  *
+  * If all goes well, you should see your Pacman agent start to
+  * win more and more games as its training proceeds.
+  */
 object PacmanTraining extends App {
 
+  // TODO: feel free to tweak α, γ and ε as you see fit
   private val initialAgentData: QLearning[AgentState, Move] =
-    QLearning(α = 0.5, γ = 0.9, ε = 0.4, Q = Map.empty)
+    QLearning(α = 0.9, γ = 1.0, ε = 0.5, Q = Map.empty)
 
   private val env: Environment[GameState, Move]                       = implicitly
   private val stateConversion: StateConversion[GameState, AgentState] = implicitly
@@ -19,7 +32,6 @@ object PacmanTraining extends App {
     implicitly
 
   private var t: Long                               = 0
-  private var episodes: Long                        = 0
   private var episodeLength                         = 0
   private var longestEpisode                        = 0
   private var wins: Long                            = 0
@@ -52,7 +64,6 @@ object PacmanTraining extends App {
     t += 1
 
     if (env.isTerminal(gameState)) {
-      episodes += 1
       longestEpisode = longestEpisode max episodeLength
 
       val won = gameState.food.isEmpty
@@ -73,15 +84,15 @@ object PacmanTraining extends App {
 
   private def report(): Unit = {
     println(s"t = $t")
-    println(s"Completed episodes = $episodes")
-    println(s"Longest episode so far = $longestEpisode")
+    println(s"Completed episodes = ${wins + losses}")
     println(s"Wins = $wins")
     println(s"Losses = $losses")
+    println(s"Longest episode so far = $longestEpisode")
     println(s"Won ${recentResults.count(identity)} of the last 10,000 games")
     println(s"State space size = ${agentData.Q.size}")
     println()
 
-    if (t % 50000000 == 0) {
+    if (t % 5000000 == 0) {
       saveQValues()
     }
   }
@@ -103,7 +114,7 @@ object PacmanTraining extends App {
   while (true) {
     step()
 
-    if (t % 10000000 == 0) {
+    if (t % 1000000 == 0) {
       report()
     }
   }

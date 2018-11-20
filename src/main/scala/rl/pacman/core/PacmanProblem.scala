@@ -18,14 +18,24 @@ object PacmanProblem {
 
   }
 
+  // convenience method for constructing a Location
   private def xy(x: Int, y: Int) = Location(x, y)
 
+  // the current game mode: are the ghosts chasing Pacman or vice versa?
   sealed trait Mode { def chasingGhosts: Boolean }
   object Mode {
     case object Normal                         extends Mode { val chasingGhosts = false }
     case class ChaseGhosts(timeRemaining: Int) extends Mode { val chasingGhosts = true  }
   }
 
+  /*
+  The complete state of the game:
+  - the location of each ghost
+  - Pacman's location
+  - the locations of all remaining food
+  - the locations of all remaining pills
+  - the current game mode
+   */
   case class GameState(
       ghost1: Location,
       ghost2: Location,
@@ -35,6 +45,7 @@ object PacmanProblem {
       mode: Mode
   )
 
+  // the actions that the agent can take to move Pacman
   sealed trait Move
   object Move {
     case object Up    extends Move
@@ -105,10 +116,10 @@ object PacmanProblem {
         allActions.filterNot(move => walls.contains(currentState.pacman.move(move)))
 
       override def step(currentState: GameState, actionTaken: Move): (GameState, Reward) = {
-        // Calculate Pacman's new location, based on actionTaken and adjacent walls.
+        // Calculate Pacman's new location, based on actionTaken and adjacent walls
         val nextPacmanLocation = updatePacmanLocation(currentState.pacman, actionTaken)
 
-        // Calculate ghosts' new locations, based on their current locations and directions.
+        // Calculate ghosts' new locations, based on their current locations and directions
         val nextGhost1 = updateGhost(currentState.ghost1, nextPacmanLocation, currentState.mode)
         val nextGhost2 = updateGhost(currentState.ghost2, nextPacmanLocation, currentState.mode)
 
@@ -170,8 +181,8 @@ object PacmanProblem {
         val reward = {
           if (pacmanCaughtByGhost)
             -100.0
-          //else if (ateFood) TODO for now we don't reward food, so the agent doesn't need to track it in its state space
-          //  1.0
+          else if (ateFood)
+            1.0
           else if (atePill)
             10.0
           else if (pacmanCaughtAGhost)
@@ -210,6 +221,7 @@ object PacmanProblem {
           val validPositions = allActions.map(ghost.move).filterNot(walls.contains)
 
           if (Random.nextDouble() < smartMoveProb) {
+            // make a "smart" move, i.e. either chase Pacman or run away from him depending on the game mode
             val sortedByDistance = validPositions
               .map(location => (location, manhattanDist(location, pacman)))
               .sortBy {
@@ -230,53 +242,30 @@ object PacmanProblem {
 
     }
 
+  /*
+  The ghosts use Manhattan distance when chasing Pacman.
+  You might find it handy for your Pacman agent as well.
+   */
   private def manhattanDist(from: Location, to: Location): Int =
     Math.abs(from.x - to.x) + Math.abs(from.y - to.y)
 
-  sealed trait AgentGhostLocation
-  object AgentGhostLocation {
-    case object FarAway                   extends AgentGhostLocation
-    case class Nearby(location: Location) extends AgentGhostLocation
-  }
+  /*
+  TODO: Define a suitable agent state, and the conversion from `GameState` to `AgentState`.
 
-  sealed trait AgentMode
-  object AgentMode {
-    case object RunAway                   extends AgentMode
-    case object ChasingGhostsPlentyOfTime extends AgentMode
-    case object ChasingGhostsNotMuchTime  extends AgentMode
-  }
+  The trick is to find a way of encoding enough information about the game state
+  without the number of states exploding.
+  e.g. if you were to track the exact locations of Pacman and both ghosts,
+  you already have 65 x 65 x 65 = 274,675 states to deal with.
 
-  // Note: the agent doesn't bother tracking where the remaining food is.
-  // TODO: really it should track food in some way, as it relates to reward,
-  // but not sure how to do so without exploding the state space even further.
-  case class AgentState(
-      ghosts: Set[AgentGhostLocation],
-      pacman: Location,
-      pills: Set[Location],
-      mode: AgentMode
-  )
+  Your state encoding should also make sense when combined with the reward function.
+  For example, the environment gives a reward when Pacman eats food, so intuitively
+  the state should track food in some way.
+   */
+  //case class AgentState(...)
+  type AgentState = GameState
 
   implicit val stateConversion: StateConversion[GameState, AgentState] = { gameState =>
-    def convertGhost(ghost: Location): AgentGhostLocation =
-      if (manhattanDist(ghost, gameState.pacman) >= 10)
-        AgentGhostLocation.FarAway
-      else
-        AgentGhostLocation.Nearby(ghost)
-
-    val ghosts = Set(convertGhost(gameState.ghost1), convertGhost(gameState.ghost2))
-
-    val mode = gameState.mode match {
-      case Mode.ChaseGhosts(t) if t >= 10 => AgentMode.ChasingGhostsPlentyOfTime
-      case Mode.ChaseGhosts(_)            => AgentMode.ChasingGhostsNotMuchTime
-      case Mode.Normal                    => AgentMode.RunAway
-    }
-
-    AgentState(
-      ghosts,
-      gameState.pacman,
-      gameState.pills,
-      mode
-    )
+    gameState
   }
 
 }

@@ -85,12 +85,14 @@ object GridworldUI {
     ctx.lineWidth = 1
     ctx.font = "30px arial"
 
+    // draw the grid
     for (i <- 0 until 5) {
       for (j <- 0 until 5) {
         ctx.strokeRect(i * cellWidth, j * cellHeight, cellWidth, cellHeight)
       }
     }
 
+    // draw the annotations on the special cells
     ctx.fillText("A", cellWidth + 10, 30)
     ctx.fillText("B", 3 * cellWidth + 10, 30)
     ctx.fillText("A'", cellWidth + 10, 4 * cellHeight + 30)
@@ -98,8 +100,8 @@ object GridworldUI {
     drawArrow(ctx, cellWidth + 20, 50, 4 * cellHeight - 10, "+10")
     drawArrow(ctx, 3 * cellWidth + 20, 50, 2 * cellHeight - 10, "+5")
 
+    // draw the agent's red dot
     ctx.fillStyle = "red"
-
     ctx.beginPath()
     ctx.arc((agentLocation.x + 0.5) * cellWidth,
             (agentLocation.y + 0.5) * cellHeight,

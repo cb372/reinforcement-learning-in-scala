@@ -152,6 +152,7 @@ object HumanUI {
     // reset transform
     ctx.setTransform(1, 0, 0, 1, 0, 0)
 
+    // time counter in top-left corner
     ctx.beginPath()
     ctx.strokeStyle = "black"
     ctx.lineWidth = 1

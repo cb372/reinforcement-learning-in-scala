@@ -5,6 +5,11 @@ import io.circe.generic.auto._
 import io.circe.generic.semiauto._
 import rl.pacman.core.PacmanProblem.{AgentState, Move}
 
+/*
+ This is just an artifact of the way we encode the Q-values as JSON.
+ Q is a Map[AgentState, Map[Move, Double]], so it has non-String keys.
+ When we write it to the JSON file we turn it into a List[(AgentState, Map[Move, Double])].
+ */
 case class QKeyValue(key: AgentState, value: Map[Move, Double])
 
 object QKeyValue {

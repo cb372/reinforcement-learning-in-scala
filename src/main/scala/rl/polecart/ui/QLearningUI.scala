@@ -182,6 +182,7 @@ object QLearningUI {
     // reset transform
     ctx.setTransform(1, 0, 0, 1, 0, 0)
 
+    // Time counter in top-left corner
     ctx.beginPath()
     ctx.strokeStyle = "black"
     ctx.lineWidth = 1

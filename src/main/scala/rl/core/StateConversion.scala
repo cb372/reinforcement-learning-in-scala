@@ -12,7 +12,7 @@ trait StateConversion[EnvState, AgentState] {
     *    knowledge of the environment, we can encode that here.
     *
     * 2. We can discard some information in order to reduce the agent's state space,
-    *    e.g. by bucketing a large number of environment states into a single agent space.
+    *    e.g. by bucketing a large number of environment states into a single agent state.
     */
   def convertState(envState: EnvState): AgentState
 

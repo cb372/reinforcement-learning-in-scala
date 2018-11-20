@@ -1,6 +1,6 @@
 package rl.gridworld.core
 
-import rl.core.{Environment, Reward, StateConversion}
+import rl.core.{Environment, Reward}
 
 object GridworldProblem {
 
@@ -32,6 +32,7 @@ object GridworldProblem {
           // special cell B: regardless of action, jump to B' and receive 5 reward
           (AgentLocation(3, 2), 5.0)
         case AgentLocation(x, y) if wouldLeaveBoard(x, y, actionTaken) =>
+          // negative reward for trying to leave the edge of the board
           (currentLocation, -1.0)
         case AgentLocation(x, y) =>
           val newLocation = actionTaken match {
@@ -40,6 +41,7 @@ object GridworldProblem {
             case Move.Left  => AgentLocation(x - 1, y)
             case Move.Right => AgentLocation(x + 1, y)
           }
+          // zero reward in all other cases
           (newLocation, 0.0)
       }
 
