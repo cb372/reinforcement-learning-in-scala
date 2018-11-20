@@ -1,131 +1,172 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Gridworld</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <style>
-        table, th, td {
-            border: 1px solid black;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 5px;
-            text-align: left;
-        }
-        div {
-            padding: 10px;
-        }
-
-        .monospace {
-            font-family: "Lucida Console", Monaco, monospace
-        }
-    </style>
+  <title>Gridworld</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
+      integrity="sha256-9mbkOfVho3ZPXfM7W8sV2SndrGDuh7wuyLjtsWeTI1Q="
+      crossorigin="anonymous" />
+  <style>
+    .monospace {
+        font-family: "Lucida Console", Monaco, monospace
+    }
+  </style>
 </head>
-<body style="margin: 0px">
+<body>
+  <div class="ui menu">
+    <a class="header item" href="index.html">RL in Scala</a>
+    <div class="active item">Gridworld</div>
+    <div class="ui simple dropdown item">
+      Pole balancing
+      <i class="dropdown icon"></i>
+      <div class="menu">
+        <a class="item" href="polecart-human.html">Try it yourself</a>
+        <a class="item" href="polecart-qlearning.html">Watch it learn</a>
+      </div>
+    </div>
+    <a class="item" href="pacman.html">Pacman</a>
+    <div class="right menu">
+      <a class="item" href="https://slides.com/cb372/reinforcement-learning-in-scala">Slides</a>
+      <a class="item" href="https://github.com/cb372/reinforcement-learning-in-scala">
+        <i class="github icon"></i>
+        Source code
+      </a>
+    </div>
+  </div>
 
-<div>
-    <canvas style="display: block" id="canvas" width="400" height="400"/>
-</div>
+  <div class="ui two column grid container">
 
-<div>
-    <button id="step">Step</button>
-    <button id="run">Run</button>
-    <button id="pause">Pause</button>
-</div>
+    <div class="eight wide column">
+      <h2 class="ui dividing header">Grid</h2>
 
-<div>Q(s, a):</div>
+      <div class="ui one column centered grid">
 
-<div>
-    <table class="monospace">
-        <tr>
+        <div class="ui twelve wide column">
+          <canvas style="display: block" id="canvas" width="400" height="400"></canvas>
+        </div>
+
+        <div class="ui twelve wide column">
+          <div class="ui segment">
+            <div class="ui top attached label">Controls</div>
+            <div>
+              <button class="ui button" id="step">Step</button>
+              <button class="ui button" id="run">Run</button>
+              <button class="ui button" id="pause">Pause</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="eight wide column">
+      <h2 class="ui dividing header">Rules</h2>
+      <ul>
+        <li>Agent can move Up, Down, Left or Right</li>
+        <li>Attempt to leave the grid &rarr; stay where you are, reward = <code>-1</code></li>
+        <li>Move in any direction from <code>A</code> &rarr; jump to <code>A'</code>, reward = <code>10</code></li>
+        <li>Move in any direction from <code>B</code> &rarr; jump to <code>B'</code>, reward = <code>5</code></li>
+        <li>All other cases, reward = <code>0</code></li>
+      </ul>
+
+    </div>
+
+    <div class="twelve wide column">
+      <h2 class="ui dividing header">Q(s, a)</h2>
+      <div>
+        <table class="ui five celled table monospace">
+          <tr>
             <td id="Q_0_0"></td>
             <td id="Q_1_0"></td>
             <td id="Q_2_0"></td>
             <td id="Q_3_0"></td>
             <td id="Q_4_0"></td>
-        </tr>
-        <tr>
+          </tr>
+          <tr>
             <td id="Q_0_1"></td>
             <td id="Q_1_1"></td>
             <td id="Q_2_1"></td>
             <td id="Q_3_1"></td>
             <td id="Q_4_1"></td>
-        </tr>
-        <tr>
+          </tr>
+          <tr>
             <td id="Q_0_2"></td>
             <td id="Q_1_2"></td>
             <td id="Q_2_2"></td>
             <td id="Q_3_2"></td>
             <td id="Q_4_2"></td>
-        </tr>
-        <tr>
+          </tr>
+          <tr>
             <td id="Q_0_3"></td>
             <td id="Q_1_3"></td>
             <td id="Q_2_3"></td>
             <td id="Q_3_3"></td>
             <td id="Q_4_3"></td>
-        </tr>
-        <tr>
+          </tr>
+          <tr>
             <td id="Q_0_4"></td>
             <td id="Q_1_4"></td>
             <td id="Q_2_4"></td>
             <td id="Q_3_4"></td>
             <td id="Q_4_4"></td>
-        </tr>
-    </table>
-</div>
+          </tr>
+        </table>
+      </div>
+    </div>
 
-<div>Policy:</div>
+    <div class="four wide column">
+      <h2 class="ui dividing header">Policy</h2>
 
-<div>
-    <table>
+      <table class="ui five celled table">
         <tr>
-            <td id="policy_0_0"></td>
-            <td id="policy_1_0"></td>
-            <td id="policy_2_0"></td>
-            <td id="policy_3_0"></td>
-            <td id="policy_4_0"></td>
+          <td id="policy_0_0"></td>
+          <td id="policy_1_0"></td>
+          <td id="policy_2_0"></td>
+          <td id="policy_3_0"></td>
+          <td id="policy_4_0"></td>
         </tr>
         <tr>
-            <td id="policy_0_1"></td>
-            <td id="policy_1_1"></td>
-            <td id="policy_2_1"></td>
-            <td id="policy_3_1"></td>
-            <td id="policy_4_1"></td>
+          <td id="policy_0_1"></td>
+          <td id="policy_1_1"></td>
+          <td id="policy_2_1"></td>
+          <td id="policy_3_1"></td>
+          <td id="policy_4_1"></td>
         </tr>
         <tr>
-            <td id="policy_0_2"></td>
-            <td id="policy_1_2"></td>
-            <td id="policy_2_2"></td>
-            <td id="policy_3_2"></td>
-            <td id="policy_4_2"></td>
+          <td id="policy_0_2"></td>
+          <td id="policy_1_2"></td>
+          <td id="policy_2_2"></td>
+          <td id="policy_3_2"></td>
+          <td id="policy_4_2"></td>
         </tr>
         <tr>
-            <td id="policy_0_3"></td>
-            <td id="policy_1_3"></td>
-            <td id="policy_2_3"></td>
-            <td id="policy_3_3"></td>
-            <td id="policy_4_3"></td>
+          <td id="policy_0_3"></td>
+          <td id="policy_1_3"></td>
+          <td id="policy_2_3"></td>
+          <td id="policy_3_3"></td>
+          <td id="policy_4_3"></td>
         </tr>
         <tr>
-            <td id="policy_0_4"></td>
-            <td id="policy_1_4"></td>
-            <td id="policy_2_4"></td>
-            <td id="policy_3_4"></td>
-            <td id="policy_4_4"></td>
+          <td id="policy_0_4"></td>
+          <td id="policy_1_4"></td>
+          <td id="policy_2_4"></td>
+          <td id="policy_3_4"></td>
+          <td id="policy_4_4"></td>
         </tr>
-    </table>
-</div>
+      </table>
+    </div>
 
-<script type="text/javascript" src="target/scala-2.12/reinforcement-learning-in-scala-fastopt.js"></script>
-<script>
+  </div>
+
+  <script type="text/javascript" src="target/scala-2.12/reinforcement-learning-in-scala-fastopt.js"></script>
+  <script>
     GridworldUI.main(
-        document,
-        document.getElementById('canvas'),
-        document.getElementById('step'),
-        document.getElementById('run'),
-        document.getElementById('pause')
+    document,
+    document.getElementById('canvas'),
+    document.getElementById('step'),
+    document.getElementById('run'),
+    document.getElementById('pause')
     );
-</script>
+  </script>
 </body>
 </html>
