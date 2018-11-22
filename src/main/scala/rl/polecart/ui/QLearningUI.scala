@@ -217,7 +217,7 @@ object QLearningUI {
       val actionValues =
         Q.getOrElse(RoughPoleCartState(cartPos, cartVel, poleAngle, poleVel), Map.empty)
       val text = (actionValues.get(PushCart.Left), actionValues.get(PushCart.Right)) match {
-        case (Some(l), Some(r)) => f"L: $l%.4f, R: $r%.4f"
+        case (Some(l), Some(r)) => f"L: $l%.4f<br/>R: $r%.4f"
         case _                  => ""
       }
 

@@ -40,21 +40,14 @@
     <div class="eight wide column">
       <h2 class="ui dividing header">Grid</h2>
 
-      <div class="ui one column centered grid">
+      <canvas id="canvas" width="400" height="400"></canvas>
 
-        <div class="ui twelve wide column">
-          <canvas style="display: block" id="canvas" width="400" height="400"></canvas>
-        </div>
-
-        <div class="ui twelve wide column">
-          <div class="ui segment">
-            <div class="ui top attached label">Controls</div>
-            <div>
-              <button class="ui button" id="step">Step</button>
-              <button class="ui button" id="run">Run</button>
-              <button class="ui button" id="pause">Pause</button>
-            </div>
-          </div>
+      <div class="ui compact segment">
+        <div class="ui top attached label">Controls</div>
+        <div>
+          <button class="ui button" id="step">Step</button>
+          <button class="ui button" id="run">Run</button>
+          <button class="ui button" id="pause">Pause</button>
         </div>
       </div>
     </div>

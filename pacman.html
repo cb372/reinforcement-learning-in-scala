@@ -1,37 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Pacman</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <style>
-        table, th, td {
-            border: 1px solid black;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 5px;
-            text-align: left;
-        }
-        div {
-            padding: 10px;
-        }
-    </style>
+  <title>Pacman</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
+        integrity="sha256-9mbkOfVho3ZPXfM7W8sV2SndrGDuh7wuyLjtsWeTI1Q="
+        crossorigin="anonymous" />
 </head>
-<body style="margin: 0px">
+<body>
+  <div class="ui menu">
+    <a class="header item" href="index.html">RL in Scala</a>
+    <a class="item" href="gridworld.html">Gridworld</a>
+    <div class="ui simple dropdown item">
+      Pole balancing
+      <i class="dropdown icon"></i>
+      <div class="menu">
+        <a class="item" href="polecart-human.html">Try it yourself</a>
+        <a class="item" href="polecart-qlearning.html">Watch it learn</a>
+      </div>
+    </div>
+    <div class="active item">Pacman</div>
+    <div class="right menu">
+      <a class="item" href="https://slides.com/cb372/reinforcement-learning-in-scala">Slides</a>
+      <a class="item" href="https://github.com/cb372/reinforcement-learning-in-scala">
+        <i class="github icon"></i>
+        Source code
+      </a>
+    </div>
+  </div>
 
-<div id="info"></div>
+  <div class="ui container">
+    <div id="info"></div>
 
-<div>
-    <canvas style="display: block" id="canvas" width="1000" height="350"/>
-</div>
+    <canvas id="canvas" width="1000" height="350"></canvas>
+  </div>
 
-<script type="text/javascript" src="target/scala-2.12/reinforcement-learning-in-scala-fastopt.js"></script>
-<script>
-    PacmanUI.main(
-        document,
-        document.getElementById('canvas'),
-        document.getElementById('info')
-    );
-</script>
+  <script type="text/javascript" src="target/scala-2.12/reinforcement-learning-in-scala-fastopt.js"></script>
+  <script>
+      PacmanUI.main(
+          document,
+          document.getElementById('canvas'),
+          document.getElementById('info')
+      );
+  </script>
 </body>
 </html>

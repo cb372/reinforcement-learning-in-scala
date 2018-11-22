@@ -1,65 +1,107 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Pole balancing - watch it learn</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <style>
-        table, th, td {
-            border: 1px solid black;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 5px;
-            text-align: left;
-        }
-        div {
-            padding: 10px;
-        }
-    </style>
+  <title>Pole balancing - watch it learn</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
+        integrity="sha256-9mbkOfVho3ZPXfM7W8sV2SndrGDuh7wuyLjtsWeTI1Q="
+        crossorigin="anonymous" />
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"
+          integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+          crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"
+          integrity="sha256-t8GepnyPmw9t+foMh3mKNvcorqNHamSKtKRxxpUEgFI="
+          crossorigin="anonymous"></script>
+  <style>
+    .side-table-header {
+      border-left: 1px solid rgba(34,36,38,.1);
+      background: #f9fafb;
+      text-align: inherit;
+      color: rgba(0,0,0,.87);
+      padding: .78571429em .78571429em;
+      vertical-align: inherit;
+      font-weight: 700;
+      border-top: 1px solid rgba(34,36,38,.1);
+    }
+    .ui.table tr:first-child th {
+      border-top:none;
+    }
+    .fix-left-border {
+      border-left: 1px solid rgba(34, 36, 38, .1) !important;
+    }
+    table.monospace td {
+      font-family: "Lucida Console", Monaco, monospace
+    }
+  </style>
 </head>
-<body style="margin: 0px">
+<body>
+  <div class="ui menu">
+    <a class="header item" href="index.html">RL in Scala</a>
+    <a class="item" href="gridworld.html">Gridworld</a>
+    <div class="ui simple dropdown item">
+      Pole balancing
+      <i class="dropdown icon"></i>
+      <div class="menu">
+        <a class="item" href="polecart-human.html">Try it yourself</a>
+        <div class="active item">Watch it learn</div>
+      </div>
+    </div>
+    <a class="item" href="pacman.html">Pacman</a>
+    <div class="right menu">
+      <a class="item" href="https://slides.com/cb372/reinforcement-learning-in-scala">Slides</a>
+      <a class="item" href="https://github.com/cb372/reinforcement-learning-in-scala">
+        <i class="github icon"></i>
+        Source code
+      </a>
+    </div>
+  </div>
 
-<div>
-    <canvas id="canvas" width="650" height="150"/>
-</div>
+  <div class="ui grid container">
+    <div class="row">
+      <div class="column">
+        <h1 class="ui header">Pole balancing - watch it learn</h1>
 
-<div>
-    <button id="step">Step</button>
-    <button id="run-episode">Run one episode</button>
-    <button id="run-forever">Run forever</button>
-    <button id="pause">Pause</button>
-</div>
+        <canvas id="canvas" width="650" height="150"></canvas>
 
-<div id="info"></div>
+        <div class="ui compact segment">
+          <div class="ui top attached label">Controls</div>
+          <div>
+            <button class="ui button" id="step">Step</button>
+            <button class="ui button" id="run-episode">Run one episode</button>
+            <button class="ui button" id="run-forever">Run forever</button>
+            <button class="ui button" id="pause">Pause</button>
+          </div>
+        </div>
 
-<div>
-    <table>
-        <thead>
-            <tr>
-                <th rowspan="3"></th>
-                <th>Cart position</th>
+        <div id="info"></div>
+      </div>
+    </div>
 
-                <th colspan="9">Left</th>
-                <th colspan="9">Middle</th>
-                <th colspan="9">Right</th>
-            </tr>
-            <tr>
-                <th>Cart velocity</th>
+    <div class="row">
+      <div class="column">
+        <h2 class="ui dividing header">Q(s, a)</h2>
+
+        <div>Tab names indicate cart position.</div>
+
+        <div class="ui top attached tabular menu">
+          <a class="item" data-tab="first">Left</a>
+          <a class="item active" data-tab="second">Middle</a>
+          <a class="item" data-tab="third">Right</a>
+        </div>
+
+        <div class="ui bottom attached tab segment" data-tab="first">
+          <table class="ui celled table monospace">
+            <thead>
+              <tr>
+                <th colspan="2">Cart velocity</th>
 
                 <th colspan="3">Fast left</th>
                 <th colspan="3">Slow</th>
                 <th colspan="3">Fast right</th>
-
-                <th colspan="3">Fast left</th>
-                <th colspan="3">Slow</th>
-                <th colspan="3">Fast right</th>
-
-                <th colspan="3">Fast left</th>
-                <th colspan="3">Slow</th>
-                <th colspan="3">Fast right</th>
-            </tr>
-            <tr>
-                <th>Pole velocity</th>
+              </tr>
+              <tr>
+                <th colspan="2">Pole velocity</th>
 
                 <th colspan="1">Fast left</th>
                 <th colspan="1">Slow</th>
@@ -72,36 +114,12 @@
                 <th colspan="1">Fast left</th>
                 <th colspan="1">Slow</th>
                 <th colspan="1">Fast right</th>
-
-                <th colspan="1">Fast left</th>
-                <th colspan="1">Slow</th>
-                <th colspan="1">Fast right</th>
-
-                <th colspan="1">Fast left</th>
-                <th colspan="1">Slow</th>
-                <th colspan="1">Fast right</th>
-
-                <th colspan="1">Fast left</th>
-                <th colspan="1">Slow</th>
-                <th colspan="1">Fast right</th>
-
-                <th colspan="1">Fast left</th>
-                <th colspan="1">Slow</th>
-                <th colspan="1">Fast right</th>
-
-                <th colspan="1">Fast left</th>
-                <th colspan="1">Slow</th>
-                <th colspan="1">Fast right</th>
-
-                <th colspan="1">Fast left</th>
-                <th colspan="1">Slow</th>
-                <th colspan="1">Fast right</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th rowspan="6">Pole angle</th>
-                <th>Very left</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th class="side-table-header" rowspan="6">Pole angle</th>
+                <th class="side-table-header fix-left-border">Very left</th>
 
                 <td id="left_fastleft_fastleft_veryleft"></td>
                 <td id="left_fastleft_slow_veryleft"></td>
@@ -112,28 +130,10 @@
                 <td id="left_fastright_fastleft_veryleft"></td>
                 <td id="left_fastright_slow_veryleft"></td>
                 <td id="left_fastright_fastright_veryleft"></td>
-                <td id="middle_fastleft_fastleft_veryleft"></td>
-                <td id="middle_fastleft_slow_veryleft"></td>
-                <td id="middle_fastleft_fastright_veryleft"></td>
-                <td id="middle_slow_fastleft_veryleft"></td>
-                <td id="middle_slow_slow_veryleft"></td>
-                <td id="middle_slow_fastright_veryleft"></td>
-                <td id="middle_fastright_fastleft_veryleft"></td>
-                <td id="middle_fastright_slow_veryleft"></td>
-                <td id="middle_fastright_fastright_veryleft"></td>
-                <td id="right_fastleft_fastleft_veryleft"></td>
-                <td id="right_fastleft_slow_veryleft"></td>
-                <td id="right_fastleft_fastright_veryleft"></td>
-                <td id="right_slow_fastleft_veryleft"></td>
-                <td id="right_slow_slow_veryleft"></td>
-                <td id="right_slow_fastright_veryleft"></td>
-                <td id="right_fastright_fastleft_veryleft"></td>
-                <td id="right_fastright_slow_veryleft"></td>
-            <td id="right_fastright_fastright_veryleft"></td>
-            </tr>
+              </tr>
 
-            <tr>
-                <th>Quite left</th>
+              <tr>
+                <th class="side-table-header fix-left-border">Quite left</th>
 
                 <td id="left_fastleft_fastleft_quiteleft"></td>
                 <td id="left_fastleft_slow_quiteleft"></td>
@@ -144,29 +144,10 @@
                 <td id="left_fastright_fastleft_quiteleft"></td>
                 <td id="left_fastright_slow_quiteleft"></td>
                 <td id="left_fastright_fastright_quiteleft"></td>
-                <td id="middle_fastleft_fastleft_quiteleft"></td>
-                <td id="middle_fastleft_slow_quiteleft"></td>
-                <td id="middle_fastleft_fastright_quiteleft"></td>
-                <td id="middle_slow_fastleft_quiteleft"></td>
-                <td id="middle_slow_slow_quiteleft"></td>
-                <td id="middle_slow_fastright_quiteleft"></td>
-                <td id="middle_fastright_fastleft_quiteleft"></td>
-                <td id="middle_fastright_slow_quiteleft"></td>
-                <td id="middle_fastright_fastright_quiteleft"></td>
-                <td id="right_fastleft_fastleft_quiteleft"></td>
-                <td id="right_fastleft_slow_quiteleft"></td>
-                <td id="right_fastleft_fastright_quiteleft"></td>
-                <td id="right_slow_fastleft_quiteleft"></td>
-                <td id="right_slow_slow_quiteleft"></td>
-                <td id="right_slow_fastright_quiteleft"></td>
-                <td id="right_fastright_fastleft_quiteleft"></td>
-                <td id="right_fastright_slow_quiteleft"></td>
-                <td id="right_fastright_fastright_quiteleft"></td>
+              </tr>
 
-            </tr>
-
-            <tr>
-                <th>Slightly left</th>
+              <tr>
+                <th class="side-table-header fix-left-border">Slightly left</th>
 
                 <td id="left_fastleft_fastleft_slightlyleft"></td>
                 <td id="left_fastleft_slow_slightlyleft"></td>
@@ -177,28 +158,10 @@
                 <td id="left_fastright_fastleft_slightlyleft"></td>
                 <td id="left_fastright_slow_slightlyleft"></td>
                 <td id="left_fastright_fastright_slightlyleft"></td>
-                <td id="middle_fastleft_fastleft_slightlyleft"></td>
-                <td id="middle_fastleft_slow_slightlyleft"></td>
-                <td id="middle_fastleft_fastright_slightlyleft"></td>
-                <td id="middle_slow_fastleft_slightlyleft"></td>
-                <td id="middle_slow_slow_slightlyleft"></td>
-                <td id="middle_slow_fastright_slightlyleft"></td>
-                <td id="middle_fastright_fastleft_slightlyleft"></td>
-                <td id="middle_fastright_slow_slightlyleft"></td>
-                <td id="middle_fastright_fastright_slightlyleft"></td>
-                <td id="right_fastleft_fastleft_slightlyleft"></td>
-                <td id="right_fastleft_slow_slightlyleft"></td>
-                <td id="right_fastleft_fastright_slightlyleft"></td>
-                <td id="right_slow_fastleft_slightlyleft"></td>
-                <td id="right_slow_slow_slightlyleft"></td>
-                <td id="right_slow_fastright_slightlyleft"></td>
-                <td id="right_fastright_fastleft_slightlyleft"></td>
-                <td id="right_fastright_slow_slightlyleft"></td>
-                <td id="right_fastright_fastright_slightlyleft"></td>
-            </tr>
+              </tr>
 
-            <tr>
-                <th>Slightly right</th>
+              <tr>
+                <th class="side-table-header fix-left-border">Slightly right</th>
 
                 <td id="left_fastleft_fastleft_slightlyright"></td>
                 <td id="left_fastleft_slow_slightlyright"></td>
@@ -209,28 +172,10 @@
                 <td id="left_fastright_fastleft_slightlyright"></td>
                 <td id="left_fastright_slow_slightlyright"></td>
                 <td id="left_fastright_fastright_slightlyright"></td>
-                <td id="middle_fastleft_fastleft_slightlyright"></td>
-                <td id="middle_fastleft_slow_slightlyright"></td>
-                <td id="middle_fastleft_fastright_slightlyright"></td>
-                <td id="middle_slow_fastleft_slightlyright"></td>
-                <td id="middle_slow_slow_slightlyright"></td>
-                <td id="middle_slow_fastright_slightlyright"></td>
-                <td id="middle_fastright_fastleft_slightlyright"></td>
-                <td id="middle_fastright_slow_slightlyright"></td>
-                <td id="middle_fastright_fastright_slightlyright"></td>
-                <td id="right_fastleft_fastleft_slightlyright"></td>
-                <td id="right_fastleft_slow_slightlyright"></td>
-                <td id="right_fastleft_fastright_slightlyright"></td>
-                <td id="right_slow_fastleft_slightlyright"></td>
-                <td id="right_slow_slow_slightlyright"></td>
-                <td id="right_slow_fastright_slightlyright"></td>
-                <td id="right_fastright_fastleft_slightlyright"></td>
-                <td id="right_fastright_slow_slightlyright"></td>
-                <td id="right_fastright_fastright_slightlyright"></td>
-            </tr>
+              </tr>
 
-            <tr>
-                <th>Quite right</th>
+              <tr>
+                <th class="side-table-header fix-left-border">Quite right</th>
 
                 <td id="left_fastleft_fastleft_quiteright"></td>
                 <td id="left_fastleft_slow_quiteright"></td>
@@ -241,28 +186,10 @@
                 <td id="left_fastright_fastleft_quiteright"></td>
                 <td id="left_fastright_slow_quiteright"></td>
                 <td id="left_fastright_fastright_quiteright"></td>
-                <td id="middle_fastleft_fastleft_quiteright"></td>
-                <td id="middle_fastleft_slow_quiteright"></td>
-                <td id="middle_fastleft_fastright_quiteright"></td>
-                <td id="middle_slow_fastleft_quiteright"></td>
-                <td id="middle_slow_slow_quiteright"></td>
-                <td id="middle_slow_fastright_quiteright"></td>
-                <td id="middle_fastright_fastleft_quiteright"></td>
-                <td id="middle_fastright_slow_quiteright"></td>
-                <td id="middle_fastright_fastright_quiteright"></td>
-                <td id="right_fastleft_fastleft_quiteright"></td>
-                <td id="right_fastleft_slow_quiteright"></td>
-                <td id="right_fastleft_fastright_quiteright"></td>
-                <td id="right_slow_fastleft_quiteright"></td>
-                <td id="right_slow_slow_quiteright"></td>
-                <td id="right_slow_fastright_quiteright"></td>
-                <td id="right_fastright_fastleft_quiteright"></td>
-                <td id="right_fastright_slow_quiteright"></td>
-                <td id="right_fastright_fastright_quiteright"></td>
-            </tr>
+              </tr>
 
-            <tr>
-                <th>Very right</th>
+              <tr>
+                <th class="side-table-header fix-left-border">Very right</th>
 
                 <td id="left_fastleft_fastleft_veryright"></td>
                 <td id="left_fastleft_slow_veryright"></td>
@@ -273,41 +200,258 @@
                 <td id="left_fastright_fastleft_veryright"></td>
                 <td id="left_fastright_slow_veryright"></td>
                 <td id="left_fastright_fastright_veryright"></td>
-                <td id="middle_fastleft_fastleft_veryright"></td>
-                <td id="middle_fastleft_slow_veryright"></td>
-                <td id="middle_fastleft_fastright_veryright"></td>
-                <td id="middle_slow_fastleft_veryright"></td>
-                <td id="middle_slow_slow_veryright"></td>
-                <td id="middle_slow_fastright_veryright"></td>
-                <td id="middle_fastright_fastleft_veryright"></td>
-                <td id="middle_fastright_slow_veryright"></td>
-                <td id="middle_fastright_fastright_veryright"></td>
-                <td id="right_fastleft_fastleft_veryright"></td>
-                <td id="right_fastleft_slow_veryright"></td>
-                <td id="right_fastleft_fastright_veryright"></td>
-                <td id="right_slow_fastleft_veryright"></td>
-                <td id="right_slow_slow_veryright"></td>
-                <td id="right_slow_fastright_veryright"></td>
-                <td id="right_fastright_fastleft_veryright"></td>
-                <td id="right_fastright_slow_veryright"></td>
-                <td id="right_fastright_fastright_veryright"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="ui bottom attached tab segment active" data-tab="second">
+          <table class="ui celled table monospace">
+            <thead>
+            <tr>
+              <th colspan="2">Cart velocity</th>
+
+              <th colspan="3">Fast left</th>
+              <th colspan="3">Slow</th>
+              <th colspan="3">Fast right</th>
+            </tr>
+            <tr>
+              <th colspan="2">Pole velocity</th>
+
+              <th colspan="1">Fast left</th>
+              <th colspan="1">Slow</th>
+              <th colspan="1">Fast right</th>
+
+              <th colspan="1">Fast left</th>
+              <th colspan="1">Slow</th>
+              <th colspan="1">Fast right</th>
+
+              <th colspan="1">Fast left</th>
+              <th colspan="1">Slow</th>
+              <th colspan="1">Fast right</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <th class="side-table-header" rowspan="6">Pole angle</th>
+              <th class="side-table-header fix-left-border">Very left</th>
+
+              <td id="middle_fastleft_fastleft_veryleft"></td>
+              <td id="middle_fastleft_slow_veryleft"></td>
+              <td id="middle_fastleft_fastright_veryleft"></td>
+              <td id="middle_slow_fastleft_veryleft"></td>
+              <td id="middle_slow_slow_veryleft"></td>
+              <td id="middle_slow_fastright_veryleft"></td>
+              <td id="middle_fastright_fastleft_veryleft"></td>
+              <td id="middle_fastright_slow_veryleft"></td>
+              <td id="middle_fastright_fastright_veryleft"></td>
             </tr>
 
-        </tbody>
-    </table>
-</div>
+            <tr>
+              <th class="side-table-header fix-left-border">Quite left</th>
 
-<script type="text/javascript" src="target/scala-2.12/reinforcement-learning-in-scala-fastopt.js"></script>
-<script>
-    PolecartQLearningUI.main(
-        document,
-        document.getElementById('canvas'),
-        document.getElementById('info'),
-        document.getElementById('step'),
-        document.getElementById('run-episode'),
-        document.getElementById('run-forever'),
-        document.getElementById('pause')
-    );
-</script>
+              <td id="middle_fastleft_fastleft_quiteleft"></td>
+              <td id="middle_fastleft_slow_quiteleft"></td>
+              <td id="middle_fastleft_fastright_quiteleft"></td>
+              <td id="middle_slow_fastleft_quiteleft"></td>
+              <td id="middle_slow_slow_quiteleft"></td>
+              <td id="middle_slow_fastright_quiteleft"></td>
+              <td id="middle_fastright_fastleft_quiteleft"></td>
+              <td id="middle_fastright_slow_quiteleft"></td>
+              <td id="middle_fastright_fastright_quiteleft"></td>
+            </tr>
+
+            <tr>
+              <th class="side-table-header fix-left-border">Slightly left</th>
+
+              <td id="middle_fastleft_fastleft_slightlyleft"></td>
+              <td id="middle_fastleft_slow_slightlyleft"></td>
+              <td id="middle_fastleft_fastright_slightlyleft"></td>
+              <td id="middle_slow_fastleft_slightlyleft"></td>
+              <td id="middle_slow_slow_slightlyleft"></td>
+              <td id="middle_slow_fastright_slightlyleft"></td>
+              <td id="middle_fastright_fastleft_slightlyleft"></td>
+              <td id="middle_fastright_slow_slightlyleft"></td>
+              <td id="middle_fastright_fastright_slightlyleft"></td>
+            </tr>
+
+            <tr>
+              <th class="side-table-header fix-left-border">Slightly right</th>
+
+              <td id="middle_fastleft_fastleft_slightlyright"></td>
+              <td id="middle_fastleft_slow_slightlyright"></td>
+              <td id="middle_fastleft_fastright_slightlyright"></td>
+              <td id="middle_slow_fastleft_slightlyright"></td>
+              <td id="middle_slow_slow_slightlyright"></td>
+              <td id="middle_slow_fastright_slightlyright"></td>
+              <td id="middle_fastright_fastleft_slightlyright"></td>
+              <td id="middle_fastright_slow_slightlyright"></td>
+              <td id="middle_fastright_fastright_slightlyright"></td>
+            </tr>
+
+            <tr>
+              <th class="side-table-header fix-left-border">Quite right</th>
+
+              <td id="middle_fastleft_fastleft_quiteright"></td>
+              <td id="middle_fastleft_slow_quiteright"></td>
+              <td id="middle_fastleft_fastright_quiteright"></td>
+              <td id="middle_slow_fastleft_quiteright"></td>
+              <td id="middle_slow_slow_quiteright"></td>
+              <td id="middle_slow_fastright_quiteright"></td>
+              <td id="middle_fastright_fastleft_quiteright"></td>
+              <td id="middle_fastright_slow_quiteright"></td>
+              <td id="middle_fastright_fastright_quiteright"></td>
+            </tr>
+
+            <tr>
+              <th class="side-table-header fix-left-border">Very right</th>
+
+              <td id="middle_fastleft_fastleft_veryright"></td>
+              <td id="middle_fastleft_slow_veryright"></td>
+              <td id="middle_fastleft_fastright_veryright"></td>
+              <td id="middle_slow_fastleft_veryright"></td>
+              <td id="middle_slow_slow_veryright"></td>
+              <td id="middle_slow_fastright_veryright"></td>
+              <td id="middle_fastright_fastleft_veryright"></td>
+              <td id="middle_fastright_slow_veryright"></td>
+              <td id="middle_fastright_fastright_veryright"></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="ui bottom attached tab segment" data-tab="third">
+          <table class="ui celled table monospace">
+            <thead>
+            <tr>
+              <th colspan="2">Cart velocity</th>
+
+              <th colspan="3">Fast left</th>
+              <th colspan="3">Slow</th>
+              <th colspan="3">Fast right</th>
+            </tr>
+            <tr>
+              <th colspan="2">Pole velocity</th>
+
+              <th colspan="1">Fast left</th>
+              <th colspan="1">Slow</th>
+              <th colspan="1">Fast right</th>
+
+              <th colspan="1">Fast left</th>
+              <th colspan="1">Slow</th>
+              <th colspan="1">Fast right</th>
+
+              <th colspan="1">Fast left</th>
+              <th colspan="1">Slow</th>
+              <th colspan="1">Fast right</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <th class="side-table-header" rowspan="6">Pole angle</th>
+              <th class="side-table-header fix-left-border">Very left</th>
+
+              <td id="right_fastleft_fastleft_veryleft"></td>
+              <td id="right_fastleft_slow_veryleft"></td>
+              <td id="right_fastleft_fastright_veryleft"></td>
+              <td id="right_slow_fastleft_veryleft"></td>
+              <td id="right_slow_slow_veryleft"></td>
+              <td id="right_slow_fastright_veryleft"></td>
+              <td id="right_fastright_fastleft_veryleft"></td>
+              <td id="right_fastright_slow_veryleft"></td>
+              <td id="right_fastright_fastright_veryleft"></td>
+            </tr>
+
+            <tr>
+              <th class="side-table-header fix-left-border">Quite left</th>
+
+              <td id="right_fastleft_fastleft_quiteleft"></td>
+              <td id="right_fastleft_slow_quiteleft"></td>
+              <td id="right_fastleft_fastright_quiteleft"></td>
+              <td id="right_slow_fastleft_quiteleft"></td>
+              <td id="right_slow_slow_quiteleft"></td>
+              <td id="right_slow_fastright_quiteleft"></td>
+              <td id="right_fastright_fastleft_quiteleft"></td>
+              <td id="right_fastright_slow_quiteleft"></td>
+              <td id="right_fastright_fastright_quiteleft"></td>
+            </tr>
+
+            <tr>
+              <th class="side-table-header fix-left-border">Slightly left</th>
+
+              <td id="right_fastleft_fastleft_slightlyleft"></td>
+              <td id="right_fastleft_slow_slightlyleft"></td>
+              <td id="right_fastleft_fastright_slightlyleft"></td>
+              <td id="right_slow_fastleft_slightlyleft"></td>
+              <td id="right_slow_slow_slightlyleft"></td>
+              <td id="right_slow_fastright_slightlyleft"></td>
+              <td id="right_fastright_fastleft_slightlyleft"></td>
+              <td id="right_fastright_slow_slightlyleft"></td>
+              <td id="right_fastright_fastright_slightlyleft"></td>
+            </tr>
+
+            <tr>
+              <th class="side-table-header fix-left-border">Slightly right</th>
+
+              <td id="right_fastleft_fastleft_slightlyright"></td>
+              <td id="right_fastleft_slow_slightlyright"></td>
+              <td id="right_fastleft_fastright_slightlyright"></td>
+              <td id="right_slow_fastleft_slightlyright"></td>
+              <td id="right_slow_slow_slightlyright"></td>
+              <td id="right_slow_fastright_slightlyright"></td>
+              <td id="right_fastright_fastleft_slightlyright"></td>
+              <td id="right_fastright_slow_slightlyright"></td>
+              <td id="right_fastright_fastright_slightlyright"></td>
+            </tr>
+
+            <tr>
+              <th class="side-table-header fix-left-border">Quite right</th>
+
+              <td id="right_fastleft_fastleft_quiteright"></td>
+              <td id="right_fastleft_slow_quiteright"></td>
+              <td id="right_fastleft_fastright_quiteright"></td>
+              <td id="right_slow_fastleft_quiteright"></td>
+              <td id="right_slow_slow_quiteright"></td>
+              <td id="right_slow_fastright_quiteright"></td>
+              <td id="right_fastright_fastleft_quiteright"></td>
+              <td id="right_fastright_slow_quiteright"></td>
+              <td id="right_fastright_fastright_quiteright"></td>
+            </tr>
+
+            <tr>
+              <th class="side-table-header fix-left-border">Very right</th>
+
+              <td id="right_fastleft_fastleft_veryright"></td>
+              <td id="right_fastleft_slow_veryright"></td>
+              <td id="right_fastleft_fastright_veryright"></td>
+              <td id="right_slow_fastleft_veryright"></td>
+              <td id="right_slow_slow_veryright"></td>
+              <td id="right_slow_fastright_veryright"></td>
+              <td id="right_fastright_fastleft_veryright"></td>
+              <td id="right_fastright_slow_veryright"></td>
+              <td id="right_fastright_fastright_veryright"></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="target/scala-2.12/reinforcement-learning-in-scala-fastopt.js"></script>
+  <script>
+      PolecartQLearningUI.main(
+          document,
+          document.getElementById('canvas'),
+          document.getElementById('info'),
+          document.getElementById('step'),
+          document.getElementById('run-episode'),
+          document.getElementById('run-forever'),
+          document.getElementById('pause')
+      );
+  </script>
+  <script>
+      $('.menu .item').tab();
+  </script>
 </body>
 </html>

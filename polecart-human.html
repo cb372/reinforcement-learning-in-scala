@@ -1,28 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Pole balancing - try it yourself</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <style>
-        div {
-            padding: 10px;
-        }
-    </style>
+  <title>Pole balancing - try it yourself</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
+        integrity="sha256-9mbkOfVho3ZPXfM7W8sV2SndrGDuh7wuyLjtsWeTI1Q="
+        crossorigin="anonymous" />
 </head>
-<body style="margin: 0px">
+<body>
+  <div class="ui menu">
+    <a class="header item" href="index.html">RL in Scala</a>
+    <a class="item" href="gridworld.html">Gridworld</a>
+    <div class="ui simple dropdown item">
+      Pole balancing
+      <i class="dropdown icon"></i>
+      <div class="menu">
+        <div class="active item">Try it yourself</div>
+        <a class="item" href="polecart-qlearning.html">Watch it learn</a>
+      </div>
+    </div>
+    <a class="item" href="pacman.html">Pacman</a>
+    <div class="right menu">
+      <a class="item" href="https://slides.com/cb372/reinforcement-learning-in-scala">Slides</a>
+      <a class="item" href="https://github.com/cb372/reinforcement-learning-in-scala">
+        <i class="github icon"></i>
+        Source code
+      </a>
+    </div>
+  </div>
 
-<div>
-    <canvas style="display: block; padding: 10px" id="canvas" width="650" height="150"/>
-</div>
-<div id="info"></div>
+  <div class="ui grid container">
+    <div class="row">
+      <div class="column">
+        <h1 class="ui header">Pole balancing - try it yourself</h1>
 
-<script type="text/javascript" src="target/scala-2.12/reinforcement-learning-in-scala-fastopt.js"></script>
-<script>
-    PolecartHumanUI.main(
-        window,
-        document.getElementById('canvas'),
-        document.getElementById('info')
-    );
-</script>
+        <canvas id="canvas" width="650" height="150"></canvas>
+
+        <div id="info"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="target/scala-2.12/reinforcement-learning-in-scala-fastopt.js"></script>
+  <script>
+      PolecartHumanUI.main(
+          window,
+          document.getElementById('canvas'),
+          document.getElementById('info')
+      );
+  </script>
 </body>
 </html>
