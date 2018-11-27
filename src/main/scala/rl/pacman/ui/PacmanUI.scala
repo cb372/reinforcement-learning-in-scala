@@ -14,6 +14,10 @@ import scala.util.{Failure, Success}
 @JSExportTopLevel("PacmanUI")
 object PacmanUI {
 
+  sealed trait UIState
+  case object Running                   extends UIState
+  case class GameOver(flashesLeft: Int) extends UIState
+
   private val env: Environment[GameState, Move]                       = implicitly
   private val stateConversion: StateConversion[GameState, AgentState] = implicitly
   private val agentBehaviour: AgentBehaviour[QLearning[AgentState, Move], AgentState, Move] =
@@ -33,24 +37,35 @@ object PacmanUI {
 
         var agentData            = initialAgentData
         var gameState: GameState = initialState
-        var episode              = 1
+        var lastAction: Move     = Move.Left
+        var uiState: UIState     = Running
 
-        def step(): Unit = {
-          val currentState    = stateConversion.convertState(gameState)
-          val possibleActions = env.possibleActions(gameState)
-          val (nextAction, updateAgent) =
-            agentBehaviour.chooseAction(agentData, currentState, possibleActions)
-          val (nextState, reward) = env.step(gameState, nextAction)
+        def step(): Unit = uiState match {
+          case Running =>
+            val currentState    = stateConversion.convertState(gameState)
+            val possibleActions = env.possibleActions(gameState)
+            val (chosenAction, updateAgent) =
+              agentBehaviour.chooseAction(agentData, currentState, possibleActions)
+            val (nextState, reward) = env.step(gameState, chosenAction)
 
-          agentData = updateAgent(ActionResult(reward, stateConversion.convertState(nextState)))
-          gameState = nextState
+            agentData = updateAgent(ActionResult(reward, stateConversion.convertState(nextState)))
+            gameState = nextState
+            lastAction = chosenAction
 
-          drawGame(canvas, gameState, nextAction)
+            drawGame(canvas, gameState, lastAction)
 
-          if (env.isTerminal(gameState)) {
-            episode += 1
+            if (env.isTerminal(gameState)) {
+              uiState = GameOver(flashesLeft = 5)
+            }
+          case GameOver(0) =>
             gameState = initialState
-          }
+            uiState = Running
+          case GameOver(n) =>
+            if (n % 2 == 0)
+              drawGame(canvas, gameState, lastAction)
+            else
+              drawBlankCanvas(canvas)
+            uiState = GameOver(n - 1)
         }
 
         dom.window.setInterval(() => step(), 500)
@@ -84,25 +99,18 @@ object PacmanUI {
     def drawEye(ghost: Location, xOffset: Int): Unit = {
       ctx.save()
 
-      ctx.translate(ghost.x * pixelSize + pixelCentre + xOffset, ghost.y * pixelSize + pixelCentre - 10)
+      ctx.translate(ghost.x * pixelSize + pixelCentre + xOffset,
+                    ghost.y * pixelSize + pixelCentre - 10)
       ctx.scale(1.0, 1.5)
 
       ctx.beginPath()
-      ctx.arc(0.0,
-        0.0,
-        4,
-        0.0,
-        Math.PI * 2.0)
+      ctx.arc(0.0, 0.0, 4, 0.0, Math.PI * 2.0)
       ctx.fillStyle = "white"
       ctx.fill()
       ctx.closePath()
 
       ctx.beginPath()
-      ctx.arc(0.0,
-        0.0,
-        2,
-        0.0,
-        Math.PI * 2.0)
+      ctx.arc(0.0, 0.0, 2, 0.0, Math.PI * 2.0)
       ctx.fillStyle = "black"
       ctx.fill()
       ctx.closePath()
@@ -191,6 +199,12 @@ object PacmanUI {
     ctx.lineTo(state.pacman.x * pixelSize + pixelCentre, state.pacman.y * pixelSize + pixelCentre)
     ctx.closePath()
     ctx.fill()
+  }
+
+  private def drawBlankCanvas(canvas: html.Canvas): Unit = {
+    val ctx = canvas.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]
+    ctx.fillStyle = "black"
+    ctx.fillRect(0, 0, 1000, 350)
   }
 
 }

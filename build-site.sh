@@ -2,7 +2,7 @@
 
 set -e
 
-sbt fullOptJS
+sbt clean fullOptJS
 
 echo "Copying reinforcement-learning-in-scala-opt.js"
 mkdir -p ../rl-in-scala/js
