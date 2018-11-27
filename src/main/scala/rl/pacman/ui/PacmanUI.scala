@@ -61,7 +61,7 @@ object PacmanUI {
   private def loadQ(info: html.Div): Future[Map[AgentState, Map[Move, Double]]] = {
     info.innerHTML = "Downloading Q-values JSON file..."
 
-    dom.ext.Ajax.get("Q.json").flatMap { r =>
+    dom.ext.Ajax.get("data/pacman/Q.json").flatMap { r =>
       info.innerHTML = "Parsing Q-values JSON file..."
 
       import io.circe.parser._
