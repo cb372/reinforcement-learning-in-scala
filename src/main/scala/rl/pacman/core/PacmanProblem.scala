@@ -216,7 +216,7 @@ object PacmanProblem {
           // if you've caught Pacman, stay where you are!
           ghost
         } else {
-          val smartMoveProb = 0.8
+          val smartMoveProb = 0.7
 
           val validPositions = allActions.map(ghost.move).filterNot(walls.contains)
 
